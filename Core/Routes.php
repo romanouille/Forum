@@ -1,4 +1,6 @@
 <?php
 $routes = [
-	"#^\/$#" => "Home.php"
+	"#^\/$#" => "Home.php",
+	"#^\/account\/login$#" => "Login.php",
+	"#^\/account\/register$#" => "Register.php"
 ];
