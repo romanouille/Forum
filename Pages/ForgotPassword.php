@@ -1,7 +1,7 @@
 <?php
 require "Pages/Layout/Start.php";
 ?>
-<h2>Connexion</h2>
+<h2>Mot de passe oublié</h2>
 
 <?php
 if (isset($messages)) {
@@ -20,16 +20,13 @@ if (isset($messages)) {
 		<div class="col m12 l6">
 			<input type="text" name="username" placeholder="Pseudo" value="<?=isset($_POST["username"]) && is_string($_POST["username"]) ? htmlspecialchars($_POST["username"]) : ""?>">
 		</div>
-		<div class="col m12 l6">
-			<input type="password" name="password" placeholder="Mot de passe" value="<?=isset($_POST["password"]) && is_string($_POST["password"]) ? htmlspecialchars($_POST["password"]) : ""?>">
-		</div>
 	</div>
 	
 	<div class="input-field">
 		<?=Captcha::generate()?>
 	</div>
 	
-	<input type="submit" class="btn"> <a href="/account/forgot-password" title="Mot de passe oublié" class="btn">Mot de passe oublié</a>
+	<input type="submit" class="btn">
 </form>
 
 <div class="input-field">

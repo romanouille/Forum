@@ -59,4 +59,51 @@ class User {
 		
 		return $db->lastInsertId();
 	}
+	
+	public function generatePasswordResetHash() : string {
+		global $db;
+		
+		
+		$hash = sha1(microtime(1).random_bytes(100));
+		$query = $db->prepare("UPDATE users SET password_reset_hash = :password_reset_hash WHERE id = :id");
+		$query->bindValue(":password_reset_hash", $hash, PDO::PARAM_STR);
+		$query->bindValue(":id", $this->id, PDO::PARAM_INT);
+		$query->execute();
+		return $hash;
+	}
+	
+	public function getEmail() : string {
+		global $db;
+		
+		$query = $db->prepare("SELECT email FROM users WHERE id = :id");
+		$query->bindValue(":id", $this->id, PDO::PARAM_INT);
+		$query->execute();
+		$data = $query->fetch();
+		
+		return trim($data["email"]);
+	}
+	
+	public static function getUserIdByResetHash(string $hash) : int {
+		global $db;
+		
+		$query = $db->prepare("SELECT id FROM users WHERE password_reset_hash = :password_reset_hash");
+		$query->bindValue(":password_reset_hash", $hash, PDO::PARAM_STR);
+		$query->execute();
+		$data = $query->fetch();
+		if (empty($data)) {
+			return 0;
+		}
+		
+		return (int)$data["id"];
+	}
+	
+	public function changePassword(string $password) : bool {
+		global $db;
+		
+		$query = $db->prepare("UPDATE users SET password = :password, password_reset_hash = '' WHERE id = :id");
+		$query->bindValue(":password", password_hash($poassword, PASSWORD_DEFAULT), PDO::PARAM_STR);
+		$query->bindValue(":id", $this->id, PDO::PARAM_INT);
+		
+		return $query->execute();
+	}
 }
