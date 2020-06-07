@@ -227,8 +227,19 @@ textarea {
 					</ul>
 					
 					<ul class="right">
+<?php
+if ($_SESSION["logged"]) {
+?>
+						<li><a href="/profile/<?=$_SESSION["username"]?>" title="Profil de <?=$_SESSION["username"]?>"><?=$_SESSION["username"]?></a>
+						<li><a href="/account/logout?hash=<?=$hash?>" title="Déconnexion">Déconnexion</a>
+<?php
+} else {
+?>
 						<li><a href="/account/login" title="Connexion">Connexion</a>
 						<li><a href="/account/register" title="Inscription">Inscription</a>
+<?php
+}
+?>
 					</ul>
 				</div>
 				

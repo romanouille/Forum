@@ -29,8 +29,11 @@ if (count($_POST) > 0) {
 	}
 	
 	if (empty($messages)) {
-		$_SESSION["logged"] = true;
-		$_SESSION["userId"] = $userId;
+		$_SESSION = [
+			"logged" => true,
+			"userId" => $userId,
+			"username" => User::getUsernameById($userId);
+		];
 		header("Location: /");
 		exit;
 	}

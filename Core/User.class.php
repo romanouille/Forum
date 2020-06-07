@@ -97,6 +97,17 @@ class User {
 		return (int)$data["id"];
 	}
 	
+	public static function getUsernameById(int $id) : string {
+		global $db;
+		
+		$query = $db->prepare("SELECT username FROM users WHERE id = :id");
+		$query->bindValue(":id", $this->id, PDO::PARAM_INT);
+		$query->execute();
+		$data = $query->fetch();
+		
+		return trim($data["username"]);
+	}
+	
 	public function changePassword(string $password) : bool {
 		global $db;
 		

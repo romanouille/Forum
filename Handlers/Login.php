@@ -32,8 +32,12 @@ if (count($_POST) > 0) {
 		$user = new User($userId);
 		
 		if ($user->checkPassword($_POST["password"])) {
-			$_SESSION["logged"] = true;
-			$_SESSION["userId"] = $userId;
+			$_SESSION = [
+				"logged" => true,
+				"userId" => $userId,
+				"username" => $_POST["username"],
+				"ip" => $_SERVER["REMOTE_ADDR"]
+			];
 			
 			header("Location: /forum");
 			exit;
