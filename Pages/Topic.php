@@ -18,19 +18,25 @@ require "Pages/Layout/Start.php";
 	<li class="waves-effect"><a href="#" title="Page suivante"><i class="material-icons">chevron_right</i></a></li>
 </ul>
 
-<div class="card light-blue lighten-5 message">
+
+<?php
+foreach ($topicMessages as $topicMessage) {
+	$userMessage = new User($topicMessage["author"]);
+	$userData = $userMessage->getData();
+?>
+<div class="card light-blue lighten-5 message" id="message_<?=$topicMessage["id"]?>">
 	<div class="card-content">
 		<div class="row">
 			<div class="col l2 s4">
 				<img src="<?=$staticServer?>/img/Avatar.png" alt="" title="Avatar">
 				<p>
 					Rang : <b>Rubis</b><br>
-					Messages : <b>1234</b><br>
-					Points : <b>1234</b>
+					Messages : <b><?=$userData["messages"]?></b><br>
+					Points : <b><?=$userData["points"]?></b>
 				</p>
 			</div>
 			<div class="col l10 s8">
-				<b class="username">edwado</b>
+				<b class="username"><?=$topicMessage["username"]?></b>
 				<div class="right">
 					<a href="#" class="btn-floating waves-effect waves-light green" title="Citer le message"><i class="material-icons">format_quote</i></a>
 					<a href="#" class="btn-floating waves-effect waves-light blue" title="Envoyer un MP"><i class="material-icons">message</i></a>
@@ -41,12 +47,52 @@ require "Pages/Layout/Start.php";
 					<a href="#" class="btn-floating waves-effect waves-light red" title="Signaler le message"><i class="material-icons">report_problem</i></a>
 				</div>
 				<br>
-				<a href="#" class="permalink" title="Lien permanent">Posté le 19/01/2019 à 17:49:00</a>
+				<a href="#" class="permalink" title="Lien permanent">Posté le <?=date("d/m/Y à H:i:s", $topicMessage["timestamp"])?></a>
 				<hr>
-					:noel:				
-			</div>
+					<?=htmlspecialchars($topicMessage["message"])?>
+				</div>
 		</div>
 	</div>
 </div>
+
+<?php
+}
+?>
+
+
+<form method="post">
+	<input type="hidden" name="hash" value="<?=$hash?>">
+	
+	<h5>Nouveau message</h5>
+	
+<?php
+if (isset($messages)) {
+?>
+	<div class="card blue white-text">
+		<div class="card-content">
+			<?=implode("<br>", $messages)?>
+		</div>
+	</div>
+<?php
+}
+?>
+	
+	<div class="row">
+		<div class="col s12 m10">
+			<div class="input-field">
+				<textarea name="message" id="message" class="materialize-textarea" placeholder="Contenu de votre sujet"><?=isset($_POST["message"]) && is_string($_POST["message"]) ? htmlspecialchars($_POST["message"]) : ""?></textarea>
+				<label for="message">Contenu de votre sujet</label>
+			</div>
+			<div class="input-field">
+				<?=Captcha::generate()?>
+			</div>
+			<div class="input-field">
+				<button type="submit" class="btn green waves-effect waves-light">Valider</button>
+				<button type="button" class="btn waves-effect waves-light">Prévisualiser</button>
+			</div>
+		</div>
+	</div>
+</form>
+
 <?php
 require "Pages/Layout/End.php";

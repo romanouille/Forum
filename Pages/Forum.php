@@ -56,7 +56,7 @@ foreach ($topics as $topic) {
 ?>
 		<tr>
 			<td><i class="material-icons yellow-text">folder</i>
-			<td><a href="/topic/<?=$forumId?>-<?=$topic["id"]?>-1-lol" title="lol"><?=$topic["title"]?></a>
+			<td><a href="/forums/<?=$forumId?>-<?=$topic["id"]?>-1-lol" title="lol"><?=$topic["title"]?></a>
 			<td><a href="/user/lol">lol</a>
 			<td class="hide-on-med-and-down">1000
 			<td class="hide-on-med-and-down">11:45:28

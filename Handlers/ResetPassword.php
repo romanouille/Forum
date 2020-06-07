@@ -32,7 +32,7 @@ if (count($_POST) > 0) {
 		$_SESSION = [
 			"logged" => true,
 			"userId" => $userId,
-			"username" => User::getUsernameById($userId);
+			"username" => User::getUsernameById($userId)
 		];
 		header("Location: /");
 		exit;

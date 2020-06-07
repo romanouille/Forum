@@ -1,9 +1,19 @@
 <?php
 class Forum {
+	/**
+	 * Constructeur
+	 *
+	 * @param int $id ID du forum
+	 */
 	public function __construct(int $id) {
 		$this->id = $id;
 	}
 	
+	/**
+	 * Vérifie si le forum existe
+	 *
+	 * @return bool Résultat
+	 */
 	public function exists() : bool {
 		global $db;
 		
@@ -15,6 +25,11 @@ class Forum {
 		return $data["nb"] == 1;
 	}
 	
+	/**
+	 * Récupère la liste des topics du forum
+	 *
+	 * @return array Résultat
+	 */
 	public function getTopics(int $page) : array {
 		global $db;
 		
@@ -28,7 +43,7 @@ class Forum {
 			$result[] = [
 				"id" => (int)$value["id"],
 				"author" => (int)$value["author"],
-				"title" => (string)$value["title"],
+				"title" => (string)trim($value["title"]),
 				"replies" => (int)$value["replies"],
 				"last_message_timestamp" => (int)$value["last_message_timestamp"]
 			];
@@ -37,6 +52,11 @@ class Forum {
 		return $result;
 	}
 	
+	/**
+	 * Récupère le nombre de pages du forum
+	 *
+	 * @return int Résultat
+	 */
 	public function getPagesNb() : int {
 		global $db;
 		

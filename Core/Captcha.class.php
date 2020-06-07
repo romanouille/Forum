@@ -2,10 +2,20 @@
 class Captcha {
 	private static $publicKey = "6LcB-AAVAAAAAHbASxkzohCi209I_Voy7fQ2SouZ", $privateKey = "6LcB-AAVAAAAAMMrPhZxxHxmeIxQZZogobc3J3Ek";
 
+	/**
+	 * Génère un captcha
+	 *
+	 * @param string $center Aligne le captcha au centre
+	 */
 	public static function generate(bool $center = false) {
 		echo "<div class=\"g-recaptcha".($center ? " captcha-center" : "")."\" data-sitekey=\"".self::$publicKey."\"></div>\n";
 	}
-
+	
+	/**
+	 * Vérifie si le captcha est valide
+	 *
+	 * @return bool Résultat
+	 */
 	public static function check() : bool {		
 		if (!isset($_POST["g-recaptcha-response"]) || empty($_POST["g-recaptcha-response"])) {
 			return false;
