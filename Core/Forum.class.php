@@ -33,7 +33,7 @@ class Forum {
 	public function getTopics(int $page) : array {
 		global $db;
 		
-		$query = $db->prepare("SELECT id, author, title, replies, last_message_timestamp FROM topics WHERE forum = :forum ORDER BY last_message_timestamp DESC LIMIT 25 OFFSET ".(($page-1)*25));
+		$query = $db->prepare("SELECT id, author, (SELECT username FROM users WHERE id = author) AS username, title, replies, last_message_timestamp, pinned, locked, deleted FROM topics WHERE forum = :forum ORDER BY last_message_timestamp DESC LIMIT 25 OFFSET ".(($page-1)*25));
 		$query->bindValue(":forum", $this->id, PDO::PARAM_INT);
 		$query->execute();
 		$data = $query->fetchAll();
@@ -43,9 +43,13 @@ class Forum {
 			$result[] = [
 				"id" => (int)$value["id"],
 				"author" => (int)$value["author"],
+				"username" => (string)$value["username"],
 				"title" => (string)trim($value["title"]),
 				"replies" => (int)$value["replies"],
-				"last_message_timestamp" => (int)$value["last_message_timestamp"]
+				"last_message_timestamp" => (int)$value["last_message_timestamp"],
+				"pinned" => (bool)$value["pinned"],
+				"locked" => (bool)$value["locked"],
+				"deleted" => (bool)$value["deleted"]
 			];
 		}
 		

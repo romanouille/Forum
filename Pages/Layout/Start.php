@@ -222,7 +222,7 @@ textarea {
 					<ul>
 						<li class="nav-logo"><a href="/" title="Accueil"><img src="https://avenoel.org/images/logo.png" alt="Avenoel.org" title="Logo d'Avenoel.org"></a>
 						<li><a href="/" title="Accueil">Accueil</a>
-						<li><a href="/forum" title="Blabla général">Forum</a>
+						<li><a href="/forums/1-1" title="Blabla général">Forum</a>
 						<li><a href="/articles" title="Articles">Articles</a>
 					</ul>
 					

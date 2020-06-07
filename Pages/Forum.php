@@ -55,11 +55,34 @@ if ($page < $pagesNb) {
 foreach ($topics as $topic) {
 ?>
 		<tr>
+<?php
+	if ($topic["deleted"]) {
+?>
+			<td><i class="material-icons blue-text">delete</i>
+<?php
+	} elseif ($topic["pinned"] && !$topic["locked"]) {
+?>
+			<td><i class="material-icons green-text">push_pin</i>
+<?php
+	} elseif ($topic["pinned"] && $topic["locked"]) {
+?>
+			<td><i class="material-icons red-text">push_pin</i>
+<?php
+	} elseif ($topic["replies"] >= 20) {
+?>
+			<td><i class="material-icons red-text">folder</i>
+<?php
+	} else {
+?>
 			<td><i class="material-icons yellow-text">folder</i>
+<?php
+	}
+?>
+	
 			<td><a href="/forums/<?=$forumId?>-<?=$topic["id"]?>-1-lol" title="lol"><?=$topic["title"]?></a>
-			<td><a href="/user/lol">lol</a>
-			<td class="hide-on-med-and-down">1000
-			<td class="hide-on-med-and-down">11:45:28
+			<td><a href="/user/<?=$topic["username"]?>"><?=$topic["username"]?></a>
+			<td class="hide-on-med-and-down"><?=$topic["replies"]?>
+			<td class="hide-on-med-and-down"><?=date("d/m H:i:s", $topic["last_message_timestamp"])?>
 			<td>
 <?php
 }
