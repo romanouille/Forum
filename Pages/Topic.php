@@ -11,12 +11,42 @@ require "Pages/Layout/Start.php";
 	<a href="#" class="btn orange darken-3 waves-effect waves-light dropdown-trigger" data-target="mod">Modération</a>
 </div>
 
-<ul class="pagination center">
-	<li class="disabled"><a href="#" title="Page précédente"><i class="material-icons">chevron_left</i></a></li>
-	<li class="active"><a href="#" title="Page 1">1</a></li>
-	<li class="waves-effect"><a href="#" title="Page 2">2</a></li>
-	<li class="waves-effect"><a href="#" title="Page suivante"><i class="material-icons">chevron_right</i></a></li>
-</ul>
+	<ul class="pagination center">
+		<li class="waves-effect<?=$page < 2 ? " disabled" : ""?>"><a href="<?=$page > 1 ? "/forums/$forumId-$topicId-".($page-1)."-$topicSlug" : "#"?>"><i class="material-icons">chevron_left</i></a></li>
+<?php
+
+$cond = $page > 6 ? $page-5 : 1;
+
+if ($cond > 1) {
+?>
+		<li class="waves-effect"><a href="/forums/<?=$forumId?>-<?=$topicId?>-1-<?=$topicSlug?>">1</a></li> ...
+<?php
+}
+
+for ($i = $cond; $i <= $page+5; $i++) {
+	if ($i > $totalPages) {
+		break;
+	}
+
+	if ($i == $page) {
+?>
+		<li class="active"><a href="#"><?=$i?></a></li>
+<?php
+	} else {
+?>
+		<li class="waves-effect"><a href="/forums/<?=$forumId?>-<?=$topicId?>-<?=$i?>-<?=$topicSlug?>"><?=$i?></a></li>
+<?php
+	}
+}
+
+if ($i <= $totalPages) {
+?>
+	... <li class="waves-effect"><a href="/forums/<?=$forumId?>-<?=$topicId?>-<?=$totalPages?>-<?=$topicSlug?>"><?=$totalPages?></a></li>
+<?php
+}
+?>
+		<li class="waves-effect<?=$page >= $totalPages ? " disabled" : ""?>"><a href="<?=$page < $totalPages ? "/forums/$forumId-$topicId-".($page+1)."-$topicSlug" : "#"?>"><i class="material-icons">chevron_right</i></a></li>
+	</ul>
 
 
 <?php
@@ -80,8 +110,8 @@ if (isset($messages)) {
 	<div class="row">
 		<div class="col s12 m10">
 			<div class="input-field">
-				<textarea name="message" id="message" class="materialize-textarea" placeholder="Contenu de votre sujet"><?=isset($_POST["message"]) && is_string($_POST["message"]) ? htmlspecialchars($_POST["message"]) : ""?></textarea>
-				<label for="message">Contenu de votre sujet</label>
+				<textarea name="message" id="message" class="materialize-textarea" placeholder="Contenu de votre message"><?=isset($_POST["message"]) && is_string($_POST["message"]) ? htmlspecialchars($_POST["message"]) : ""?></textarea>
+				<label for="message">Contenu de votre message</label>
 			</div>
 			<div class="input-field">
 				<?=Captcha::generate()?>

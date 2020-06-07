@@ -48,8 +48,8 @@ class Topic {
 		$query->execute();
 		$topicId = $db->lastInsertId();
 		
-		$topic = new Topic($topicId);
-		$topic->createMessage($forum, $author, $message);
+		$topic = new Topic($forum, $topicId);
+		$topic->createMessage($author, $message);
 		
 		return $topicId;
 	}

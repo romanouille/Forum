@@ -20,6 +20,8 @@ if (!$topic->exists()) {
 }
 
 $topicMessages = $topic->getMessages($page);
+$totalPages = $topic->getPagesNb();
+$topicSlug = $topic->getSlug();
 
 
 if (count($_POST) > 0) {
