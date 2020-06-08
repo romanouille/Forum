@@ -222,7 +222,7 @@ textarea {
 					<ul>
 						<li class="nav-logo"><a href="/" title="Accueil"><img src="https://avenoel.org/images/logo.png" alt="Avenoel.org" title="Logo d'Avenoel.org"></a>
 						<li><a href="/" title="Accueil">Accueil</a>
-						<li><a href="/forums/1-1" title="Blabla général">Forum</a>
+						<li><a href="/forum" title="Blabla général">Forum</a>
 						<li><a href="/articles" title="Articles">Articles</a>
 					</ul>
 					
@@ -230,7 +230,7 @@ textarea {
 <?php
 if ($_SESSION["logged"]) {
 ?>
-						<li><a href="/profile/<?=$_SESSION["username"]?>" title="Profil de <?=$_SESSION["username"]?>"><?=$_SESSION["username"]?></a>
+						<li><a href="/account/<?=$_SESSION["username"]?>" title="Profil de <?=$_SESSION["username"]?>"><?=$_SESSION["username"]?></a>
 						<li><a href="/account/logout?hash=<?=$hash?>" title="Déconnexion">Déconnexion</a>
 <?php
 } else {
@@ -245,7 +245,7 @@ if ($_SESSION["logged"]) {
 				
 				<ul class="sidenav" id="mobile">
 					<li><a href="/" title="Accueil">Accueil</a>
-					<li><a href="/forums/1-1-blabla-general" title="Blabla général">Forum</a>
+					<li><a href="/forum" title="Blabla général">Forum</a>
 					<li><a href="/chat/1-chat" title="Chat">Chat</a>
 					<li><a href="/account/login" title="Connexion">Connexion</a>
 					<li><a href="/account/register" title="Inscription">Inscription</a>

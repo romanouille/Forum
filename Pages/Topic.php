@@ -50,11 +50,12 @@ if ($i <= $totalPages) {
 
 
 <?php
+$i = 1;
 foreach ($topicMessages as $topicMessage) {
 	$userMessage = new User($topicMessage["author"]);
 	$userData = $userMessage->getData();
 ?>
-<div class="card light-blue lighten-5 message" id="message_<?=$topicMessage["id"]?>">
+<div class="card light-<?=$i == 1 ? "blue" : "green"?> lighten-5 message" id="message_<?=$topicMessage["id"]?>">
 	<div class="card-content">
 		<div class="row">
 			<div class="col l2 s4">
@@ -68,7 +69,7 @@ foreach ($topicMessages as $topicMessage) {
 			<div class="col l10 s8">
 				<b class="username"><?=$topicMessage["username"]?></b>
 				<div class="right">
-					<a href="#" class="btn-floating waves-effect waves-light green" title="Citer le message"><i class="material-icons">format_quote</i></a>
+					<a href="#message" class="btn-floating waves-effect waves-light green" title="Citer le message" onclick="quoteMessage(<?=$topicMessage["id"]?>)"><i class="material-icons">format_quote</i></a>
 					<a href="#" class="btn-floating waves-effect waves-light blue" title="Envoyer un MP"><i class="material-icons">message</i></a>
 					<a href="#" class="btn-floating waves-effect waves-light grey" title="Éditer le message"><i class="material-icons">edit</i></a>
 					<a href="#" class="btn-floating waves-effect waves-light red" title="Kicker le membre"><i class="material-icons">gavel</i></a>
@@ -79,13 +80,14 @@ foreach ($topicMessages as $topicMessage) {
 				<br>
 				<a href="#" class="permalink" title="Lien permanent">Posté le <?=date("d/m/Y à H:i:s", $topicMessage["timestamp"])?></a>
 				<hr>
-					<?=htmlspecialchars($topicMessage["message"])?>
+					<?=parseMessage($topicMessage["message"])?>
 				</div>
 		</div>
 	</div>
 </div>
 
 <?php
+	$i = $i == 1 ? 2 : 1;
 }
 ?>
 

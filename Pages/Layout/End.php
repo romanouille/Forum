@@ -39,6 +39,10 @@ document.addEventListener("DOMContentLoaded", function() {
 	var elems = document.querySelectorAll(".sidenav");
 	var instances = M.Sidenav.init(elems);
 });
+
+function quoteMessage(messageId) {
+	document.getElementsByName("message")[0].value += "[quote:"+messageId+"]\n"
+}
 		</script>
 	</body>
 </html>

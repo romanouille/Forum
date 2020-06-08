@@ -3,8 +3,8 @@ require "Core/Captcha.class.php";
 require "Core/Forum.class.php";
 require "Core/Topic.class.php";
 
-$forumId = $match[1];
-$page = $match[2];
+$forumId = 1;
+$page = isset($match[1]) ? $match[1] : 1;
 
 $forum = new Forum($forumId);
 if (!$forum->exists()) {

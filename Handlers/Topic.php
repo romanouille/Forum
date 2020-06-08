@@ -2,8 +2,9 @@
 require "Core/Forum.class.php";
 require "Core/Topic.class.php";
 require "Core/Captcha.class.php";
+require "Core/Message.class.php";
 
-$forumId = $match[1];
+$forumId = 1;
 $topicId = $match[2];
 $page = $match[3];
 

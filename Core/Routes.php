@@ -6,6 +6,6 @@ $routes = [
 	"#^\/account\/forgot-password$#" => "ForgotPassword.php",
 	"#^\/account\/reset\/(.+)$#" => "ResetPassword.php",
 	"#^\/account\/logout\?hash=(.+)$#" => "Logout.php",
-	"#^\/forums\/([0-9]+)-([0-9]+)$#" => "Forum.php",
-	"#^\/forums\/([0-9]+)-([0-9]+)-([0-9]+)-(.+)$#" => "Topic.php"
+	"#^\/forum$#" => "Forum.php",
+	"#^\/forums/([0-9]+)-([0-9]+)-([0-9]+)-(.+)$#" => "Topic.php"
 ];
