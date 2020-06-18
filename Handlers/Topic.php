@@ -4,7 +4,7 @@ require "Core/Topic.class.php";
 require "Core/Captcha.class.php";
 require "Core/Message.class.php";
 
-$forumId = 1;
+$forumId = $match[1];
 $topicId = $match[2];
 $page = $match[3];
 
@@ -14,6 +14,8 @@ if (!$forum->exists()) {
 	require "Handlers/Error.php";
 }
 
+$forumName = $forum->getName();
+
 $topic = new Topic($forumId, $topicId);
 if (!$topic->exists()) {
 	http_response_code(404);
@@ -22,8 +24,8 @@ if (!$topic->exists()) {
 
 $topicMessages = $topic->getMessages($page);
 $totalPages = $topic->getPagesNb();
-$topicSlug = $topic->getSlug();
-
+$topicTitle = $topic->getTitle();
+$topicSlug = slug($topicTitle);
 
 if (count($_POST) > 0) {
 	$messages = [];
@@ -45,10 +47,12 @@ if (count($_POST) > 0) {
 		$topic = new Topic($forumId, $topicId);
 		$messageId = $topic->createMessage($_SESSION["userId"], $_POST["message"]);
 		
-		header("Location: /forums/$forumId-$topicId-".$topic->getPagesNb()."-".$topic->getSlug()."#message_$messageId");
+		header("Location: /forums/$forumId-$topicId-".$topic->getPagesNb()."-".slug($topicTitle)."#message_$messageId");
 		exit;
 	}
 }
 
+
+$breadcrumb = ["Forum ".htmlspecialchars($forumName), "Sujet « ".htmlspecialchars($topicTitle)." »"];
 
 require "Pages/Topic.php";

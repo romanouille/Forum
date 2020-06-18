@@ -39,4 +39,8 @@ if (count($_POST) > 0) {
 	}
 }
 
+
+
+$breadcrumb = ["Mon compte", "Réinitialiser mon mot de passe"];
+
 require "Pages/ResetPassword.php";

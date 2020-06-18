@@ -27,9 +27,11 @@ if (count($_POST) > 0) {
 		$user = new User($userId);
 		$hash = $user->generatePasswordResetHash();
 		
-		Mail::send($user->getEmail(), "Réinitialisation de votre mot de passe", "Bonjour,\n\nVotre lien de réinitialisation de mot de passe Avenoel est : https://avenoel.com/account/reset/$hash");
+		Mail::send($user->getEmail(), "Réinitialisation de votre mot de passe", "Bonjour,\n\nVotre lien de réinitialisation de mot de passe Avenoel est : https://avenoel.io/account/reset/$hash");
 		$messages[] = "Un mail de réinitialisation de mot de passe vous a été envoyé.";
 	}
 }
+
+$breadcrumb = ["Mon compte", "Mot de passe oublié"];
 
 require "Pages/ForgotPassword.php";

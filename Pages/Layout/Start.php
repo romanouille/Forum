@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr">
 	<head>
-		<title>Avenoel.org</title>
+		<title><?=implode(" - ", array_reverse($breadcrumb))?> - Hikikomori</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -50,7 +50,7 @@ body {
 
 header nav {
 	height: 70px;
-	border-bottom: 4px solid #b71c1c
+	border-bottom: 4px solid #3653A3
 }
 
 header .nav-wrapper li {
@@ -64,8 +64,8 @@ header .nav-wrapper li a {
 }
 
 header .nav-logo {
-	margin-top: 12px;
-	width: auto!important
+	width: auto!important;
+	height:67px
 }
 
 header .mobile-logo {
@@ -182,7 +182,7 @@ hr {
 
 footer {
 	text-align: center;
-	border-top: 4px solid #B71C1C;
+	border-top: 4px solid #3653A3;
 	padding: 20px;
 	color: #fff
 }
@@ -216,13 +216,13 @@ textarea {
 					<i class="material-icons">menu</i>
 				</a>
 				
-				<a href="/" title="Accueil" class="sidenav-trigger mobile-logo"><img src="https://avenoel.org/images/logo.png" alt="Avenoel.org" title="Logo d'Avenoel.org">
+				<a href="/" title="Accueil" class="sidenav-trigger mobile-logo"><img src="http://127.0.0.2/img/Logo.png" alt="Hikikomori" title="Logo d'Hikikomori">
 
 				<div class="hide-on-med-and-down container">
 					<ul>
-						<li class="nav-logo"><a href="/" title="Accueil"><img src="https://avenoel.org/images/logo.png" alt="Avenoel.org" title="Logo d'Avenoel.org"></a>
+						<li class="nav-logo"><a href="/" title="Accueil"><img src="http://127.0.0.2/img/Logo.png" alt="Hikikomori" title="Logo d'Hikikomori"></a>
 						<li><a href="/" title="Accueil">Accueil</a>
-						<li><a href="/forum" title="Blabla général">Forum</a>
+						<li><a href="/forums/blabla/1" title="Blabla général">Forum</a>
 						<li><a href="/articles" title="Articles">Articles</a>
 					</ul>
 					
@@ -246,7 +246,6 @@ if ($_SESSION["logged"]) {
 				<ul class="sidenav" id="mobile">
 					<li><a href="/" title="Accueil">Accueil</a>
 					<li><a href="/forum" title="Blabla général">Forum</a>
-					<li><a href="/chat/1-chat" title="Chat">Chat</a>
 					<li><a href="/account/login" title="Connexion">Connexion</a>
 					<li><a href="/account/register" title="Inscription">Inscription</a>
 				</ul>
@@ -260,8 +259,14 @@ if ($_SESSION["logged"]) {
 						<div class="block">
 						
 							<ul id="breadcrumb">
-								<li><a href="/" title="Accueil">Avenoel.org</a>
-								<li>Breadcrumb
+								<li><a href="/" title="Accueil">Hikikomori</a>
+<?php
+foreach ($breadcrumb as $value) {
+?>
+								<li><?=$value?>
+<?php
+}
+?>
 							</ul>
 							
 							<hr>

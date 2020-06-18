@@ -185,7 +185,7 @@ class User {
 		global $db;
 		
 		$query = $db->prepare("SELECT username FROM users WHERE id = :id");
-		$query->bindValue(":id", $this->id, PDO::PARAM_INT);
+		$query->bindValue(":id", $id, PDO::PARAM_INT);
 		$query->execute();
 		$data = $query->fetch();
 		
@@ -207,5 +207,49 @@ class User {
 		$query->bindValue(":id", $this->id, PDO::PARAM_INT);
 		
 		return $query->execute();
+	}
+	
+	/**
+	 * Récupère la liste des messages privés de l'utilisateur
+	 *
+	 * @param int $page Page*
+	 *
+	 * @return array Liste des messages privés
+	 */
+	public function getPmList(int $page) : array {
+		global $db;
+		
+		$query = $db->prepare("SELECT pm_id, (SELECT title FROM pm WHERE id = pm_id) AS title, (SELECT author FROM pm WHERE id = pm_id) AS author, timestamp FROM pm_receivers WHERE user_id = :user_id ORDER BY timestamp DESC LIMIT 25 OFFSET ".(($page-1)*25));
+		$query->bindValue(":user_id", $this->id, PDO::PARAM_INT);
+		$query->execute();
+		$data = $query->fetchAll();
+		$result = [];
+		
+		foreach ($data as $value) {
+			$result[] = [
+				"id" => (int)$value["pm_id"],
+				"title" => (string)trim($value["title"]),
+				"username" => User::getUsernameById($value["author"]),
+				"timestamp" => (int)$value["timestamp"]
+			];
+		}
+		
+		return $result;
+	}
+	
+	/** 
+	* Récupère le nombre de pages de messages privés de l'utilisateur
+	*
+	* @return int Résultat
+	*/
+	public function getPmListPagesNb() : int {
+		global $db;
+		
+		$query = $db->prepare("SELECT COUNT(*) AS nb FROM pm_receivers WHERE user_id = :user_id");
+		$query->bindValue(":user_id", $this->id, PDO::PARAM_INT);
+		$query->execute();
+		$data = $query->fetch();
+		
+		return ceil($data["nb"]/25);
 	}
 }

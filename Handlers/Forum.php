@@ -3,8 +3,13 @@ require "Core/Captcha.class.php";
 require "Core/Forum.class.php";
 require "Core/Topic.class.php";
 
-$forumId = 1;
-$page = isset($match[1]) ? $match[1] : 1;
+$forumId = Forum::getIdByName($match[1]);
+if ($forumId < 1) {
+	http_response_code(404);
+	require "Handlers/Error.php";
+}
+
+$page = isset($match[2]) ? $match[2] : 1;
 
 $forum = new Forum($forumId);
 if (!$forum->exists()) {
@@ -12,8 +17,40 @@ if (!$forum->exists()) {
 	require "Handlers/Error.php";
 }
 
-$topics = $forum->getTopics($page);
-$pagesNb = $forum->getPagesNb();
+$forumName = $forum->getName();
+if (strtolower($forumName) != $match[1]) {
+	http_response_code(404);
+	require "Handlers/Error.php";
+}
+
+
+if (isset($match[3]) && isset($match[4]) && is_string($match[3]) && is_string($match[4])) {
+	$isSearch = true;
+	// C'est une recherche
+	
+	$searchText = $match[3];
+	
+	if ($match[4] == "title") {
+		$searchType = 1;
+	} elseif ($match[4] == "author") {
+		$searchType = 2;
+	} else {
+		http_response_code(400);
+		require "Handlers/Error.php";
+	}
+	
+	$topics = $forum->getTopics($page, $searchType, $searchText);
+	$pagesNb = $forum->getPagesNb($searchType, $searchText, $forumId);
+} else {
+	$topics = $forum->getTopics($page);
+	$pagesNb = $forum->getPagesNb();
+	$isSearch = false;
+}
+
+if ($page > $pagesNb && $page != 1) {
+	http_response_code(404);
+	require "Handlers/Error.php";
+}
 
 if (count($_POST) > 0) {
 	$messages = [];
@@ -39,8 +76,13 @@ if (count($_POST) > 0) {
 	
 	if (empty($messages)) {
 		$topicId = Topic::create($forumId, $_SESSION["userId"], $_POST["title"], $_POST["message"]);
-		$messages[] = "Id du topic : $topicId";
+		
+		header("Location: /forums/$forumId-$topicId-1-".slug($_POST["title"]));
+		exit;
 	}
 }
+
+
+$breadcrumb = ["Forum ".htmlspecialchars($forumName), "Page $page"];
 
 require "Pages/Forum.php";

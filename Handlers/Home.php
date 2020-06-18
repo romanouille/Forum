@@ -1,5 +1,5 @@
 <?php
-$breadcrumb = ["Accueil" => "/"];
+$breadcrumb = ["Accueil"];
 
 
 require "Pages/Home.php";

@@ -54,4 +54,7 @@ if (count($_POST) > 0) {
 	}
 }
 
+
+$breadcrumb = ["Mon compte", "Créer un compte"];
+
 require "Pages/Register.php";

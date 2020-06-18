@@ -39,12 +39,14 @@ if (count($_POST) > 0) {
 				"ip" => $_SERVER["REMOTE_ADDR"]
 			];
 			
-			header("Location: /forum");
+			header("Location: /forums/blabla/1");
 			exit;
 		} else {
 			$messages[] = "Le mot de passe que vous avez spécifié est incorrect.";
 		}
 	}
 }
+
+$breadcrumb = ["Mon compte", "Connexion"];
 
 require "Pages/Login.php";

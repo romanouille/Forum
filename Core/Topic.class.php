@@ -72,8 +72,17 @@ class Topic {
 		$query->bindValue(":message", $message, PDO::PARAM_STR);
 		$query->bindValue(":timestamp", time(), PDO::PARAM_INT);
 		$query->execute();
+		$messageId = $db->lastInsertId();
 		
-		return $db->lastInsertId();
+		$query = $db->prepare("UPDATE users SET points = points + 1, messages = messages + 1 WHERE id = :id");
+		$query->bindValue(":id", $author, PDO::PARAM_INT);
+		$query->execute();
+		
+		$query = $db->prepare("UPDATE topics SET replies = replies + 1 WHERE id = :id");
+		$query->bindValue(":id", $this->id, PDO::PARAM_INT);
+		$query->execute();
+		
+		return $messageId;
 	}
 	
 	/**
@@ -121,7 +130,12 @@ class Topic {
 		return ceil($data["nb"]/20);
 	}
 	
-	public function getSlug() : string {
+	/**
+	 * Récupère le titre du topic
+	 *
+	 * @reutrn string Slug
+	 */
+	public function getTitle() : string {
 		global $db;
 		
 		$query = $db->prepare("SELECT title FROM topics WHERE id = :id");
@@ -129,6 +143,6 @@ class Topic {
 		$query->execute();
 		$data = $query->fetch();
 		
-		return slug(trim($data["title"]));
+		return trim($data["title"]);
 	}
 }

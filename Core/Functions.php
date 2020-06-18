@@ -24,6 +24,13 @@ function slug(string $text) : string {
 	return $text;
 }
 
+/**
+ * Parse un message
+ *
+ * @param string $message Message à parser
+ *
+ * @return string Message parsé
+ */
 function parseMessage(string $message) : string {
 	preg_match_all("`\[quote:(.+)]`isU", $message, $quotes);
 	
@@ -33,9 +40,15 @@ function parseMessage(string $message) : string {
 			$data = $quote->load();
 			$message = str_replace($quotes[0][$originalQuote], "<blockquote><b>Le ".date("d/m/Y à H:i:s").", {$data["username"]} a écrit :</b><br><br>{$data["message"]}</blockquote>", $message);
 		} else {
-			$message = str_replace($quotes[0][$originalQuote], "<blockquote><b>Message supprimé</b></blockquote>", $message);
+			$message = str_replace($quotes[0][$originalQuote], "<blockquote><b>Cette citation ne peut pas être affichée, car son contenu a été supprimé</b></blockquote>", $message);
 		}
 	}
+	
+	$message = preg_replace("#\[b\](.+)\[\/b\]#iUs", '<b>$1</b>', $message);
+	$message = preg_replace("#\[i\](.+)\[\/i\]#iUs", '<i>$1</i>', $message);
+	$message = preg_replace("#\[s\](.+)\[\/s\]#iUs", '<s>$1</s>', $message);
+	$message = preg_replace("#\[u\](.+)\[\/u\]#iUs", '<u>$1</u>', $message);
+	$message = preg_replace("#\[spoilers\](.+)\[\/spoilers\]#iUs", 'Fonction spoiler indisponible', $message);
 	
 	return $message;
 }
