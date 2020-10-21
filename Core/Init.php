@@ -7,28 +7,32 @@ if ($devMode) {
 
 $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-session_set_cookie_params(86400, "/", $_SERVER["HTTP_HOST"], $_SERVER["SERVER_PORT"] == 443, true);
-session_name("session");
-session_start();
-
 $staticServer = "http://127.0.0.5";
 
-if (!empty($_SESSION)) {
-	/*if ($_SERVER["REMOTE_ADDR"] != $_SESSION["ip"]) {
-		session_destroy();
+if (isset($_COOKIE["session"])) {
+	$session = new Session($_COOKIE["session"]);
+	if (!$session->exists()) {
+		setcookie("session", null, -1);
 		header("Location: {$_SERVER["REQUEST_URI"]}");
 		exit;
-	}*/
+	}
+	
+	
+	$sessionData = $session->getData();
+	
+	if ($sessionData["deleted"]) {
+		setcookie("session", null, -1, "/", $_SERVER["HTTP_HOST"], $_SERVER["SERVER_PORT"] == 443, true);
+		header("Location: {$_SERVER["REQUEST_URI"]}");
+		exit;
+	}
+	
+	$userLogged = true;
+	$session->update();
+	$user = new User($sessionData["user_id"]);
+	$userData = $user->getData();
 	
 	$hash = sha1($_COOKIE["session"]);
-	$user = new User($_SESSION["userId"]);
-	$userData = $user->getData();
 } else {
-	$_SESSION = [
-		"ip" => $_SERVER["REMOTE_ADDR"],
-		"userId" => 0,
-		"logged" => false
-	];
-	
+	$userLogged = false;
 	$hash = sha1($_SERVER["REMOTE_ADDR"]);
 }

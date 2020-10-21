@@ -26,7 +26,8 @@
 		</main>
 		
 		<footer class="grey darken-4">
-			SiteInternet.org 2020<br>Version 1.0
+			&copy; Avenoel<br>
+			<a href="mailto:contact@avenoel.com" title="Contact">Contact</a>
 		</footer>
 		
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>

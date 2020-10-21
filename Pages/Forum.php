@@ -5,12 +5,13 @@ require "Pages/Layout/Start.php";
 	<div class="row">
 		<input type="hidden" name="mode" value="search">
 		<div class="col l3 m12 s12">
-			<input type="text" name="content" placeholder="Rechercher">
+			<input type="text" name="content" placeholder="Rechercher" value="<?=isset($searchText) ? htmlspecialchars($searchText) : ""?>">
 		</div>
 		<div class="col l3 m12 s12">
 			<select name="type">
-				<option value="title">Sujet</option>
-				<option value="author">Auteur</option>
+				<option value="title"<?=isset($match[4]) && $match[4] == "title" ? " selected" : ""?>>Sujet</option>
+				<option value="author"<?=isset($match[4]) && $match[4] == "author" ? " selected" : ""?>>Auteur</option>
+				<option value="message"<?=isset($match[4]) && $match[4] == "message" ? " selected" : ""?>>Message</option>
 			</select>
 		</div>
 		<div class="col l6 m12 s12">
@@ -101,6 +102,18 @@ foreach ($topics as $topic) {
 			<td class="hide-on-med-and-down"><?=date("d/m H:i:s", $topic["last_message_timestamp"])?>
 			<td>
 <?php
+	if (isset($topic["message"])) {
+?>
+			<tr>
+				<td>
+				<td><?=$topic["message"]?>
+				<td>
+				<td class="hide-on-med-and-down">
+				<td class="hide-on-med-and-down"><?=date("d/m H:i:s", $topic["message_timestamp"])?>
+				<td>
+<?php
+	}
+
 }
 ?>
 	</tbody>

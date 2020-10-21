@@ -2,8 +2,8 @@
 require "Core/Captcha.class.php";
 require "Core/Mail.class.php";
 
-if ($_SESSION["logged"]) {
-	header("Location: /");
+if ($userLogged) {
+	header("Location: /forums/blabla/1");
 	exit;
 }
 

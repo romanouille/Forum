@@ -43,17 +43,61 @@ class Forum {
 			$query = $db->prepare("SELECT id, author, (SELECT username FROM users WHERE id = author) AS username, title, replies, last_message_timestamp, pinned, locked, deleted FROM topics WHERE forum = :forum AND title ILIKE :title ORDER BY last_message_timestamp DESC LIMIT 25 OFFSET ".(($page-1)*25));
 			$query->bindValue(":title", "%$searchData%", PDO::PARAM_STR);
 		} elseif ($searchType == 2) {
-			$query = $db->prepare("SELECT id FROM users WHERE username = :username");
-			$query->bindValue(":username", $searchData, PDO::PARAM_STR);
+			$query = $db->prepare("SELECT id FROM users WHERE username ILIKE :username");
+			$query->bindValue(":username", "%$searchData%", PDO::PARAM_STR);
 			$query->execute();
-			$data = $query->fetch();
+			$data = $query->fetchAll();
 			if (empty($data)) {
 				return [];
 			}
 			
-			$query = $db->prepare("SELECT id, author, (SELECT username FROM users WHERE id = author) AS username, title, replies, last_message_timestamp, pinned, locked, deleted FROM topics WHERE forum = :forum AND author = :author ORDER BY last_message_timestamp DESC LIMIT 25 OFFSET ".(($page-1)*25));
-			$query->bindValue(":author", $data["id"], PDO::PARAM_INT);
+			$result = [];
+			foreach ($data as $value) {
+				$result[] = $value["id"];
+			}
+			
+			$query = $db->prepare("SELECT id, author, (SELECT username FROM users WHERE id = author) AS username, title, replies, last_message_timestamp, pinned, locked, deleted FROM topics WHERE forum = :forum AND author IN (".implode(",", $result).") ORDER BY last_message_timestamp DESC LIMIT 25 OFFSET ".(($page-1)*25));
+		} elseif ($searchType == 3) {
+			$query = $db->prepare("SELECT id, topic, message, (SELECT username FROM users WHERE id = author) AS username, timestamp FROM messages WHERE forum = :forum AND message ILIKE :message AND message NOT ILIKE '[quote:%]' ORDER BY timestamp DESC LIMIT 25 OFFSET ".(($page-1)*25));
+			$query->bindValue(":forum", $this->id, PDO::PARAM_INT);
+			$query->bindValue(":message", "%$searchData%", PDO::PARAM_STR);
+			$query->execute();
+			$data = $query->fetchAll();
+			
+			if (empty($data)) {
+				return [];
+			}
+			
+			$result = [];
+			foreach ($data as $nb=>$value) {
+				$result[$nb] = [
+					"id" => (int)$value["id"],
+					"topic" => (int)$value["topic"],
+					"message" => (string)trim($value["message"]),
+					"username" => (string)trim($value["username"]),
+					"message_timestamp" => (int)$value["timestamp"]
+				];
+				
+				$query = $db->prepare("SELECT id, title, replies, last_message_timestamp, pinned, locked, deleted FROM topics WHERE id = :id");
+				$query->bindValue(":id", (int)$value["topic"], PDO::PARAM_INT);
+				$query->execute();
+				$data2 = $query->fetch();
+				
+				$result[$nb] = array_merge($result[$nb], [
+					"id" => (int)$data2["id"],
+					"title" => (string)trim($data2["title"]),
+					"replies" => (int)$data2["replies"],
+					"last_message_timestamp" => (int)$data2["last_message_timestamp"],
+					"pinned" => (bool)$data2["pinned"],
+					"locked" => (bool)$data2["locked"],
+					"deleted" => (bool)$data2["deleted"]
+				]);
+			}
+			
+			return $result;
 		}
+			
+		
 		
 		$query->bindValue(":forum", $this->id, PDO::PARAM_INT);
 		$query->execute();
@@ -96,17 +140,25 @@ class Forum {
 			$query->bindValue(":forum", $forumId, PDO::PARAM_INT);
 			$query->bindValue(":title", "%$searchData%", PDO::PARAM_STR);
 		} elseif ($searchType == 2) {
-			$query = $db->prepare("SELECT id FROM users WHERE username = :username");
-			$query->bindValue(":username", $searchData, PDO::PARAM_STR);
+			$query = $db->prepare("SELECT id FROM users WHERE username ILIKE :username");
+			$query->bindValue(":username", "%$searchData%", PDO::PARAM_STR);
 			$query->execute();
-			$data = $query->fetch();
+			$data = $query->fetchAll();
 			if (empty($data)) {
-				return 0;
+				return [];
 			}
 			
-			$query = $db->prepare("SELECT COUNT(*) AS nb FROM topics WHERE forum = :forum AND author = :author");
+			$result = [];
+			foreach ($data as $value) {
+				$result[] = $value["id"];
+			}
+			
+			$query = $db->prepare("SELECT COUNT(*) AS nb FROM topics WHERE forum = :forum AND author IN (".implode(",", $result).")");
 			$query->bindValue(":forum", $forumId, PDO::PARAM_INT);
-			$query->bindValue(":author", $data["id"], PDO::PARAM_INT);
+		} elseif ($searchType == 3) {
+			$query = $db->prepare("SELECT COUNT(*) AS nb FROM messages WHERE forum = :forum AND message ILIKE :message AND message NOT ILIKE '[quote:%]'");
+			$query->bindValue(":forum", $forumId, PDO::PARAM_INT);
+			$query->bindValue(":message", "%$searchData%", PDO::PARAM_STR);
 		}
 			
 		$query->execute();

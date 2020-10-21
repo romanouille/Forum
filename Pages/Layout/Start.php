@@ -232,9 +232,9 @@ textarea {
 					
 					<ul class="right">
 <?php
-if ($_SESSION["logged"]) {
+if ($userLogged) {
 ?>
-						<li><a href="/account/<?=$_SESSION["username"]?>" title="Profil de <?=$_SESSION["username"]?>"><?=$_SESSION["username"]?></a>
+						<li><a href="/account/<?=$userData["username"]?>" title="Profil de <?=$userData["username"]?>"><?=$userData["username"]?></a>
 						<li><a href="/account/logout?hash=<?=$hash?>" title="Déconnexion">Déconnexion</a>
 <?php
 } else {

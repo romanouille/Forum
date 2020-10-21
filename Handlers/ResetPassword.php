@@ -1,7 +1,7 @@
 <?php
 require "Core/Captcha.class.php";
 
-if ($_SESSION["logged"]) {
+if ($userLogged) {
 	header("Location: /");
 	exit;
 }
@@ -29,12 +29,8 @@ if (count($_POST) > 0) {
 	}
 	
 	if (empty($messages)) {
-		$_SESSION = [
-			"logged" => true,
-			"userId" => $userId,
-			"username" => User::getUsernameById($userId)
-		];
-		header("Location: /");
+		Session::create($userId);
+		header("Location: /forums/blabla/1");
 		exit;
 	}
 }

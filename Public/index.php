@@ -9,6 +9,7 @@ set_include_path("../");
 
 require "Core/Functions.php";
 require "Core/Routes.php";
+require "Core/Session.class.php";
 require "Core/User.class.php";
 require "Core/Init.php";
 

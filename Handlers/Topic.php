@@ -44,7 +44,7 @@ if (isset($match[5]) || $match[4] != $topicSlug) {
 	exit;
 }
 
-if ($_SESSION["logged"] && count($_POST) > 0) {
+if ($userLogged && count($_POST) > 0) {
 	$messages = [];
 	$_POST = array_map("trim", $_POST);
 	
@@ -62,9 +62,9 @@ if ($_SESSION["logged"] && count($_POST) > 0) {
 	
 	if (empty($messages)) {
 		$topic = new Topic($forumId, $topicId);
-		$messageId = $topic->createMessage($_SESSION["userId"], $_POST["message"]);
+		$messageId = $topic->createMessage($sessionData["user_id"], $_POST["message"]);
 		
-		header("Location: /forums/$forumId-$topicId-".$topic->getPagesNb()."-".slug($topicTitle)."#message_$messageId");
+		header("Location: /forums/{$match[1]}/$topicId-".$topic->getPagesNb()."-".slug($topicTitle)."#message_$messageId");
 		exit;
 	}
 }

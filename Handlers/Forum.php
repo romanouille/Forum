@@ -35,6 +35,8 @@ if (isset($match[3]) && isset($match[4]) && is_string($match[3]) && is_string($m
 		$searchType = 1;
 	} elseif ($match[4] == "author") {
 		$searchType = 2;
+	} elseif ($match[4] == "message") {
+		$searchType = 3;
 	} else {
 		http_response_code(400);
 		require "Handlers/Error.php";
@@ -53,7 +55,7 @@ if ($page > $pagesNb && $page != 1) {
 	require "Handlers/Error.php";
 }
 
-if ($_SESSION["logged"] && count($_POST) > 0) {
+if ($userLogged && count($_POST) > 0) {
 	$messages = [];
 	$poll = false;
 	$_POST = array_map(function($a) { return is_string($a) ? trim($a) : $a; }, $_POST);
@@ -99,7 +101,7 @@ if ($_SESSION["logged"] && count($_POST) > 0) {
 	}
 	
 	if (empty($messages)) {
-		$topicId = Topic::create($forumId, $_SESSION["userId"], $_POST["title"], $_POST["message"]);
+		$topicId = Topic::create($forumId, $sessionData["user_id"], $_POST["title"], $_POST["message"]);
 		if (!empty($_POST["poll_question"])) {
 			Poll::create($topicId, $_POST["poll_question"], $_POST["poll_points"], $_POST["poll_responses"]);
 		}
