@@ -4,7 +4,7 @@ require "Core/Topic.class.php";
 require "Core/Captcha.class.php";
 require "Core/Message.class.php";
 
-$forumId = $match[1];
+$forumId = Forum::getIdByName($match[1]);
 $topicId = $match[2];
 $page = $match[3];
 
@@ -22,12 +22,29 @@ if (!$topic->exists()) {
 	require "Handlers/Error.php";
 }
 
+$poll = $topic->getPoll();
+$votedOnPoll = $user->votedOnPoll($topicId);
+
+if (isset($match[5]) && isset($match[6]) && !$votedOnPoll && $userData["points"] >= $poll["points"]) {
+	if ($match[6] != $hash) {
+		http_response_code(400);
+		require "Handlers/Error.php";
+	}
+	
+	$user->voteOnPoll($topicId, $match[5]);
+}
+
 $topicMessages = $topic->getMessages($page);
 $totalPages = $topic->getPagesNb();
 $topicTitle = $topic->getTitle();
 $topicSlug = slug($topicTitle);
 
-if (count($_POST) > 0) {
+if (isset($match[5]) || $match[4] != $topicSlug) {
+	header("Location: /forums/{$match[1]}/$topicId-$page-$topicSlug");
+	exit;
+}
+
+if ($_SESSION["logged"] && count($_POST) > 0) {
 	$messages = [];
 	$_POST = array_map("trim", $_POST);
 	
@@ -51,7 +68,6 @@ if (count($_POST) > 0) {
 		exit;
 	}
 }
-
 
 $breadcrumb = ["Forum ".htmlspecialchars($forumName), "Sujet « ".htmlspecialchars($topicTitle)." »"];
 

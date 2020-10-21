@@ -252,4 +252,41 @@ class User {
 		
 		return ceil($data["nb"]/25);
 	}
+	
+	public function votedOnPoll(int $topicId) {
+		global $db;
+		
+		$query = $db->prepare("SELECT COUNT(*) AS nb FROM polls_votes WHERE topic = :topic AND user_id = :user_id");
+		$query->bindValue(":topic", $topicId, PDO::PARAM_INT);
+		$query->bindValue(":user_id", $this->id, PDO::PARAM_INT);
+		$query->execute();
+		$data = $query->fetch();
+		
+		return $data["nb"] == 1;
+	}
+	
+	public function voteOnPoll(int $topic, int $response) : bool {
+		global $db;
+		
+		$query = $db->prepare("SELECT COUNT(*) AS nb FROM polls_responses WHERE topic = :topic AND id = :response");
+		$query->bindValue(":topic", $topic, PDO::PARAM_INT);
+		$query->bindValue(":response", $response, PDO::PARAM_INT);
+		$query->execute();
+		$data = $query->fetch();
+		
+		if ($data["nb"] == 0) {
+			return false;
+		}
+		
+		$query = $db->prepare("UPDATE polls_responses SET votes = votes + 1 WHERE id = :id");
+		$query->bindValue(":id", $response, PDO::PARAM_INT);
+		$query->execute();
+		
+		$query = $db->prepare("INSERT INTO polls_votes(topic, user_id, response) VALUES(:topic, :user_id, :response)");
+		$query->bindValue(":topic", $topic, PDO::PARAM_INT);
+		$query->bindValue(":user_id", $this->id, PDO::PARAM_INT);
+		$query->bindValue(":response", $response, PDO::PARAM_STR);
+		
+		return $query->execute();
+	}
 }

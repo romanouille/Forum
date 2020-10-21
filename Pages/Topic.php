@@ -3,6 +3,32 @@ require "Pages/Layout/Start.php";
 ?>
 <h4 class="center">Sujet : « <?=htmlspecialchars($topicTitle)?> »</h4>
 
+<?php
+if (!empty($poll)) {
+?>
+<div class="card blue-grey darken-1">
+	<div class="card-content white-text">
+		<span class="card-title">Sondage (minimum <?=$poll["points"]?> point<?=$poll["points"] > 1 ? "s" : ""?>)</span>
+		<h6><?=htmlspecialchars($poll["question"])?></h6><br>
+		
+<?php
+	foreach ($poll["responses"] as $value) {
+		if (!$votedOnPoll && $userData["points"] >= $poll["points"]) {
+?>
+		<a href="<?=$_SERVER["REQUEST_URI"]?>?poll_response=<?=$value["id"]?>&token=<?=$hash?>" style="color:white"><?=htmlspecialchars($value["response"])?></a> (<?=$value["votes"]?> vote<?=$value["votes"] > 1 ? "s" : ""?>)<br>
+<?php
+		} else {
+?>
+		<?=htmlspecialchars($value["response"])?></a> (<?=$value["votes"]?> vote<?=$value["votes"] > 1 ? "s" : ""?>)<br>
+<?php
+		}
+	}
+?>
+	</div>
+</div>
+<?php
+}
+?>
 <a href="#post" title="Répondre" class="btn blue waves-effect waves-light">Répondre</a>
 <a href="/forums/blabla/1" title="Liste des sujets" class="btn blue waves-effect waves-light">Liste des sujets</a>
 <a href="#" title="Suivre" class="btn blue waves-effect waves-light">Suivre</a>
@@ -59,7 +85,7 @@ foreach ($topicMessages as $topicMessage) {
 	<div class="card-content">
 		<div class="row">
 			<div class="col l2 s4">
-				<img src="http://127.0.0.2/img/Avatar.png" alt="" title="Avatar">
+				<img src="<?=$staticServer?>/img/Avatar.png" alt="" title="Avatar">
 				<p>
 					Rang : <b>Indéterminé</b><br>
 					Messages : <b><?=$userData["messages"]?></b><br>

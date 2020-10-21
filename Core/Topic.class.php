@@ -145,4 +145,45 @@ class Topic {
 		
 		return trim($data["title"]);
 	}
+	
+	public function getPoll() : array {
+		global $db;
+		
+		$query = $db->prepare("SELECT COUNT(*) AS nb FROM polls WHERE topic = :topic");
+		$query->bindValue(":topic", $this->id, PDO::PARAM_INT);
+		$query->execute();
+		$data = $query->fetch();
+		
+		if ($data["nb"] == 0) {
+			return [];
+		}
+		
+		$result = [
+			"question" => "",
+			"points" => 0,
+			"responses" => []
+		];
+		
+		$query = $db->prepare("SELECT question, points FROM polls WHERE topic = :topic");
+		$query->bindValue(":topic", $this->id, PDO::PARAM_INT);
+		$query->execute();
+		$data = $query->fetch();
+		$result["question"] = (string)$data["question"];
+		$result["points"] = (int)$data["points"];
+		
+		$query = $db->prepare("SELECT id, response, votes FROM polls_responses WHERE topic = :topic ORDER BY votes DESC");
+		$query->bindValue(":topic", $this->id, PDO::PARAM_INT);
+		$query->execute();
+		$data = $query->fetchAll();
+		
+		foreach ($data as $value) {
+			$result["responses"][] = [
+				"id" => (int)$value["id"],
+				"response" => (string)$value["response"],
+				"votes" => (int)$value["votes"]
+			];
+		}
+		
+		return $result;
+	}
 }

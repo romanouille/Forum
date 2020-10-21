@@ -11,7 +11,7 @@ session_set_cookie_params(86400, "/", $_SERVER["HTTP_HOST"], $_SERVER["SERVER_PO
 session_name("session");
 session_start();
 
-$staticServer = "http://127.0.0.3";
+$staticServer = "http://127.0.0.5";
 
 if (!empty($_SESSION)) {
 	/*if ($_SERVER["REMOTE_ADDR"] != $_SESSION["ip"]) {
@@ -22,6 +22,7 @@ if (!empty($_SESSION)) {
 	
 	$hash = sha1($_COOKIE["session"]);
 	$user = new User($_SESSION["userId"]);
+	$userData = $user->getData();
 } else {
 	$_SESSION = [
 		"ip" => $_SERVER["REMOTE_ADDR"],

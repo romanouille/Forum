@@ -1,6 +1,7 @@
 <?php
 require "Core/Captcha.class.php";
 require "Core/Forum.class.php";
+require "Core/Poll.class.php";
 require "Core/Topic.class.php";
 
 $forumId = Forum::getIdByName($match[1]);
@@ -52,9 +53,10 @@ if ($page > $pagesNb && $page != 1) {
 	require "Handlers/Error.php";
 }
 
-if (count($_POST) > 0) {
+if ($_SESSION["logged"] && count($_POST) > 0) {
 	$messages = [];
-	$_POST = array_map("trim", $_POST);
+	$poll = false;
+	$_POST = array_map(function($a) { return is_string($a) ? trim($a) : $a; }, $_POST);
 	
 	if (!isset($_POST["hash"]) || !is_string($_POST["hash"]) || $_POST["hash"] != $hash) {
 		$messages[] = "Le formulaire est invalide, veuillez réessayer.";
@@ -70,14 +72,39 @@ if (count($_POST) > 0) {
 		$messages[] = "Vous devez spécifier le contenu de votre sujet.";
 	}
 	
+	if (isset($_POST["poll_question"]) && is_string($_POST["poll_question"]) && !empty($_POST["poll_question"]) && strlen($_POST["poll_question"]) <= 255) {
+		if (!isset($_POST["poll_points"]) || !is_string($_POST["poll_points"]) || !is_numeric($_POST["poll_points"]) || $_POST["poll_points"] < 1) {
+			$messages[] = "Vous devez spécifier le nombre de points nécessaire pour répondre à votre sondage.";
+		}
+		
+		if (!isset($_POST["poll_responses"]) || !is_array($_POST["poll_responses"]) || empty($_POST["poll_responses"])) {
+			$messages[] = "Vous devez spécifier les réponses à votre sondage.";
+		} else {
+			foreach ($_POST["poll_responses"] as $nb=>$value) {
+				if (!is_string($value) || empty($value) || strlen($value) > 255) {
+					unset($_POST["poll_responses"][$nb]);
+				}
+			}
+			
+			if (count($_POST["poll_responses"]) < 2) {
+				$messages[] = "Votre sondage doit se composer d'au minimum 2 réponses.";
+			} else {
+				$poll = true;
+			}
+		}
+	}
+	
 	if (!Captcha::check()) {
 		$messages[] = "Vous devez prouver que vous n'êtes pas un robot.";
 	}
 	
 	if (empty($messages)) {
 		$topicId = Topic::create($forumId, $_SESSION["userId"], $_POST["title"], $_POST["message"]);
+		if (!empty($_POST["poll_question"])) {
+			Poll::create($topicId, $_POST["poll_question"], $_POST["poll_points"], $_POST["poll_responses"]);
+		}
 		
-		header("Location: /forums/$forumId-$topicId-1-".slug($_POST["title"]));
+		header("Location: /forums/{$match[1]}/$topicId-1-".slug($_POST["title"]));
 		exit;
 	}
 }

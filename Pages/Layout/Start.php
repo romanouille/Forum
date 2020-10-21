@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr">
 	<head>
-		<title><?=implode(" - ", array_reverse($breadcrumb))?> - Hikikomori</title>
+		<title><?=implode(" - ", array_reverse($breadcrumb))?> - Avenoel</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -31,6 +31,10 @@ main {
 
 body {
 	background: grey
+}
+
+.nav-logo img {
+	margin-top:10px
 }
 
 @media (max-width:992px) {
@@ -216,11 +220,11 @@ textarea {
 					<i class="material-icons">menu</i>
 				</a>
 				
-				<a href="/" title="Accueil" class="sidenav-trigger mobile-logo"><img src="http://127.0.0.2/img/Logo.png" alt="Hikikomori" title="Logo d'Hikikomori">
+				<a href="/" title="Accueil" class="sidenav-trigger mobile-logo"><img src="<?=$staticServer?>/img/Logo.png" alt="Avenoel" title="Logo d'Avenoel">
 
 				<div class="hide-on-med-and-down container">
 					<ul>
-						<li class="nav-logo"><a href="/" title="Accueil"><img src="http://127.0.0.2/img/Logo.png" alt="Hikikomori" title="Logo d'Hikikomori"></a>
+						<li class="nav-logo"><a href="/" title="Accueil"><img src="<?=$staticServer?>/img/Logo.png" alt="Avenoel" title="Logo d'Avenoel"></a>
 						<li><a href="/" title="Accueil">Accueil</a>
 						<li><a href="/forums/blabla/1" title="Blabla général">Forum</a>
 						<li><a href="/articles" title="Articles">Articles</a>
@@ -259,7 +263,7 @@ if ($_SESSION["logged"]) {
 						<div class="block">
 						
 							<ul id="breadcrumb">
-								<li><a href="/" title="Accueil">Hikikomori</a>
+								<li><a href="/" title="Accueil">Avenoel</a>
 <?php
 foreach ($breadcrumb as $value) {
 ?>

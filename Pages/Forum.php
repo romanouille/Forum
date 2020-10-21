@@ -95,7 +95,7 @@ foreach ($topics as $topic) {
 	}
 ?>
 	
-			<td><a href="/forums/<?=$forumId?>-<?=$topic["id"]?>-1-<?=slug($topic["title"])?>" title="<?=htmlspecialchars($topic["title"])?>"><?=$topic["title"]?></a>
+			<td><a href="/forums/<?=$match[1]?>/<?=$topic["id"]?>-1-<?=slug($topic["title"])?>" title="<?=htmlspecialchars($topic["title"])?>"><?=$topic["title"]?></a>
 			<td><a href="/user/<?=$topic["username"]?>"><?=$topic["username"]?></a>
 			<td class="hide-on-med-and-down"><?=$topic["replies"]?>
 			<td class="hide-on-med-and-down"><?=date("d/m H:i:s", $topic["last_message_timestamp"])?>
@@ -170,6 +170,53 @@ if (isset($messages)) {
 	
 	<div class="row">
 		<div class="col s12 m10">
+			<div style="display:none" id="poll">
+				<div class="input-field">
+					<button class="btn waves-effect waves-light" onclick="pollNewResponse()">Ajouter une réponse</button>
+				</div>
+				<div class="input-field">
+					<input type="text" name="poll_question" placeholder="Saisissez la question du sondage" value="<?=isset($_POST["poll_question"]) && is_string($_POST["poll_question"]) ? htmlspecialchars($_POST["poll_question"]) : ""?>">
+					<label for="poll_title">
+						Question du sondage
+					</label>
+				</div>
+				<div class="input-field">
+					<input type="text" name="poll_points" placeholder="Nombre de points minimum" value="<?=isset($_POST["poll_points"]) && is_string($_POST["poll_points"]) ? htmlspecialchars($_POST["poll_points"]) : 1?>">
+					<label for="poll_title">
+						Nombre de points minimum
+					</label>
+				</div>
+<?php
+if (isset($_POST["poll_question"]) && is_string($_POST["poll_question"]) && isset($_POST["poll_responses"])) {
+	foreach ($_POST["poll_responses"] as $value) {
+?>
+				<div class="input-field">
+					<input type="text" name="poll_responses[]" placeholder="Saisissez une réponse" value="<?=is_string($value) ? htmlspecialchars($value) : ""?>">
+					<label for="poll_title">
+						Saisissez une réponse
+					</label>
+				</div>
+<?php
+	}
+} else {
+?>
+				<div class="input-field">
+					<input type="text" name="poll_responses[]" placeholder="Saisissez une réponse">
+					<label for="poll_title">
+						Saisissez une réponse
+					</label>
+				</div>
+				<div class="input-field">
+					<input type="text" name="poll_responses[]" placeholder="Saisissez une réponse">
+					<label for="poll_title">
+						Saisissez une réponse
+					</label>
+				</div>
+<?php
+}
+?>
+			</div><br><br>
+			
 			<div class="input-field">
 				<input type="text" name="title" id="title" placeholder="Titre du sujet" value="<?=isset($_POST["title"]) && is_string($_POST["title"]) ? htmlspecialchars($_POST["title"]) : ""?>">
 				<label for="title">
@@ -183,36 +230,6 @@ if (isset($messages)) {
 				<button type="button" class="btn btn-small" onclick="addBetweenSelectedText('message', '[u]', '[/u]')"><i class="material-icons">highlight</i></button>
 				<button type="button" class="btn btn-small" onclick="addBetweenSelectedText('message', '[spoilers]', '[/spoilers]')"><i class="material-icons">remove_red_eye</i></button>
 				<button type="button" class="btn btn-small" onclick="alert('Indisponible')"><i class="material-icons">insert_emoticon</i></button>
-				<a class="waves-effect waves-light btn modal-trigger" href="#modal1">Créer un sondage</a>
-				
-				
-				
-				<div id="modal1" class="modal">
-					<div class="modal-content">
-						<h4>Créer un sondage</h4>
-						<div class="input-field">
-							<input type="text" class="validate" name="pollTitle" placeholder="Titre du sondage">
-							<label for="pollTitle">Titre du sondage</label>
-						</div>
-						
-						<div class="input-field">
-							<input type="text" class="validate" name="pollPoints" placeholder="Nombre de points requis (optionnel)">
-							<label for="pollPoints">Nombre de points requis (optionnel)</label>
-						</div>
-						
-						<div id="pollOptions">
-							<div class="input-field">
-								<input type="text" class="validate" name="pollResponse[]" placeholder="Option">
-								<label for="pollResponse[]">Option</label>
-							</div>
-						</div>
-						
-						<button type="button" class="btn" onclick="pollAddOption()">Ajouter des options</button>
-					</div>
-					<div class="modal-footer">
-						<a href="#" class="modal-close waves-effect waves-green btn-flat">Valider</a>
-					</div>
-				</div>
 				
 				
 				
@@ -225,6 +242,7 @@ if (isset($messages)) {
 			<div class="input-field">
 				<button type="submit" class="btn green waves-effect waves-light">Valider</button>
 				<button type="button" class="btn waves-effect waves-light">Prévisualiser</button>
+				<button type="button" class="btn waves-effect waves-light" onclick="document.getElementById('poll').style.display = ''">Ajouter un sondage</button>
 			</div>
 		</div>
 	</div>

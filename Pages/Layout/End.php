@@ -64,10 +64,10 @@ function addBetweenSelectedText(el, start, end) {
 	document.getElementById(el).value += start + text + end;
 }
 
-function pollAddOption() {
-	document.getElementById("pollOptions").innerHTML += '							<div class="input-field">\
-								<input type="text" class="validate" name="pollResponse[]" placeholder="Option">\
-							</div>';
+function pollNewResponse() {
+	document.getElementById("poll").innerHTML += '				<div class="input-field">\
+					<input type="text" name="poll_responses[]" placeholder="Saisissez une réponse">\
+				</div>';
 }
 
 		</script>
