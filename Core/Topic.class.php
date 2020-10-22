@@ -49,7 +49,7 @@ class Topic {
 		$topicId = $db->lastInsertId();
 		
 		$topic = new Topic($forum, $topicId);
-		$topic->createMessage($author, $message);
+		$topic->createMessage($author, $message, false);
 		
 		return $topicId;
 	}
@@ -62,14 +62,14 @@ class Topic {
 	 *
 	 * @return int ID du message créé
 	 */
-	public function createMessage(int $author, string $message) : int {
+	public function createMessage(int $author, string $content, bool $incrementReplies = true) : int {
 		global $db;
 		
-		$query = $db->prepare("INSERT INTO messages(forum, topic, author, message, timestamp) VALUES(:forum, :topic, :author, :message, :timestamp)");
+		$query = $db->prepare("INSERT INTO messages(forum, topic, author, content, timestamp) VALUES(:forum, :topic, :author, :content, :timestamp)");
 		$query->bindValue(":forum", $this->forumId, PDO::PARAM_INT);
 		$query->bindValue(":topic", $this->id, PDO::PARAM_INT);
 		$query->bindValue(":author", $author, PDO::PARAM_INT);
-		$query->bindValue(":message", $message, PDO::PARAM_STR);
+		$query->bindValue(":content", $content, PDO::PARAM_STR);
 		$query->bindValue(":timestamp", time(), PDO::PARAM_INT);
 		$query->execute();
 		$messageId = $db->lastInsertId();
@@ -78,9 +78,11 @@ class Topic {
 		$query->bindValue(":id", $author, PDO::PARAM_INT);
 		$query->execute();
 		
-		$query = $db->prepare("UPDATE topics SET replies = replies + 1 WHERE id = :id");
-		$query->bindValue(":id", $this->id, PDO::PARAM_INT);
-		$query->execute();
+		if ($incrementReplies) {
+			$query = $db->prepare("UPDATE topics SET replies = replies + 1 WHERE id = :id");
+			$query->bindValue(":id", $this->id, PDO::PARAM_INT);
+			$query->execute();
+		}
 		
 		return $messageId;
 	}
@@ -95,7 +97,7 @@ class Topic {
 	public function getMessages(int $page) : array {
 		global $db;
 		
-		$query = $db->prepare("SELECT id, author, (SELECT username FROM users WHERE id = author) AS username, message, timestamp FROM messages WHERE topic = :topic LIMIT 20 OFFSET ".(($page-1)*20));
+		$query = $db->prepare("SELECT id, author, (SELECT username FROM users WHERE id = author) AS username, content, timestamp FROM messages WHERE topic = :topic LIMIT 20 OFFSET ".(($page-1)*20));
 		$query->bindValue(":topic", $this->id, PDO::PARAM_INT);
 		$query->execute();
 		$data = $query->fetchAll();
@@ -106,7 +108,7 @@ class Topic {
 				"id" => (int)$value["id"],
 				"author" => (int)$value["author"],
 				"username" => (string)trim($value["username"]),
-				"message" => (string)trim($value["message"]),
+				"content" => (string)trim($value["content"]),
 				"timestamp" => (int)$value["timestamp"]
 			];
 		}
@@ -168,7 +170,7 @@ class Topic {
 		$query->bindValue(":topic", $this->id, PDO::PARAM_INT);
 		$query->execute();
 		$data = $query->fetch();
-		$result["question"] = (string)$data["question"];
+		$result["question"] = (string)trim($data["question"]);
 		$result["points"] = (int)$data["points"];
 		
 		$query = $db->prepare("SELECT id, response, votes FROM polls_responses WHERE topic = :topic ORDER BY votes DESC");
@@ -179,7 +181,7 @@ class Topic {
 		foreach ($data as $value) {
 			$result["responses"][] = [
 				"id" => (int)$value["id"],
-				"response" => (string)$value["response"],
+				"response" => (string)trim($value["response"]),
 				"votes" => (int)$value["votes"]
 			];
 		}

@@ -30,7 +30,7 @@ if (!empty($poll)) {
 }
 ?>
 <a href="#post" title="Répondre" class="btn blue waves-effect waves-light">Répondre</a>
-<a href="/forums/blabla/1" title="Liste des sujets" class="btn blue waves-effect waves-light">Liste des sujets</a>
+<a href="/forums/blabla-general/1" title="Liste des sujets" class="btn blue waves-effect waves-light">Liste des sujets</a>
 <a href="#" title="Suivre" class="btn blue waves-effect waves-light">Suivre</a>
 
 <div class="right">
@@ -95,9 +95,15 @@ foreach ($topicMessages as $topicMessage) {
 			<div class="col l10 s8">
 				<b class="username"><?=$topicMessage["username"]?></b>
 				<div class="right">
-					<a href="#message" class="btn-floating waves-effect waves-light green" title="Citer le message" onclick="quoteMessage(<?=$topicMessage["id"]?>)"><i class="material-icons">format_quote</i></a>
+					<a href="#content" class="btn-floating waves-effect waves-light green" title="Citer le message" onclick="quoteMessage(<?=$topicMessage["id"]?>)"><i class="material-icons">format_quote</i></a>
 					<a href="#" class="btn-floating waves-effect waves-light blue" title="Envoyer un MP"><i class="material-icons">message</i></a>
-					<a href="#" class="btn-floating waves-effect waves-light grey" title="Éditer le message"><i class="material-icons">edit</i></a>
+<?php
+if ($topicMessage["author"] == $sessionData["user_id"] && time()-$topicMessage["timestamp"] <= 600) {
+?>
+					<a href="<?=$_SERVER["REQUEST_URI"]?>?edit_message=<?=$topicMessage["id"]?>" class="btn-floating waves-effect waves-light grey" title="Éditer le message" target="_blank"><i class="material-icons">edit</i></a>
+<?php
+}
+?>
 					<a href="#" class="btn-floating waves-effect waves-light red" title="Kicker le membre"><i class="material-icons">gavel</i></a>
 					<a href="#" class="btn-floating waves-effect waves-light black" title="Bannir le membre"><i class="material-icons">gavel</i></a>
 					<a href="#" class="btn-floating waves-effect waves-light red" title="Supprimer le message"><i class="material-icons">delete</i></a>
@@ -106,8 +112,10 @@ foreach ($topicMessages as $topicMessage) {
 				<br>
 				<a href="#" class="permalink" title="Lien permanent">Posté le <?=date("d/m/Y à H:i:s", $topicMessage["timestamp"])?></a>
 				<hr>
-					<?=parseMessage($topicMessage["message"])?>
+				<div class="message-content">
+					<?=parseMessage($topicMessage["content"], $topicMessage["id"])?>
 				</div>
+			</div>
 		</div>
 	</div>
 </div>
@@ -156,12 +164,15 @@ if ($i <= $totalPages) {
 
 
 <form method="post" id="post">
-	<input type="hidden" name="hash" value="<?=$hash?>">
+	<input type="hidden" name="token" value="<?=$hash?>">
 	
 	<h5>Nouveau message</h5>
 	
 <?php
-if (isset($messages)) {
+if ($userLogged) {
+?>
+<?php
+	if (isset($messages)) {
 ?>
 	<div class="card blue white-text">
 		<div class="card-content">
@@ -169,20 +180,19 @@ if (isset($messages)) {
 		</div>
 	</div>
 <?php
-}
+	}
 ?>
 	
 	<div class="row">
 		<div class="col s12 m10">
 			<div class="input-field">
-				<button type="button" class="btn btn-small" onclick="addBetweenSelectedText('message', '[b]', '[/b]')"><i class="material-icons">format_bold</i></button>
-				<button type="button" class="btn btn-small" onclick="addBetweenSelectedText('message', '[i]', '[/i]')"><i class="material-icons">format_italic</i></button>
-				<button type="button" class="btn btn-small" onclick="addBetweenSelectedText('message', '[s]', '[/s]')"><i class="material-icons">indeterminate_check_box</i></button>
-				<button type="button" class="btn btn-small" onclick="addBetweenSelectedText('message', '[u]', '[/u]')"><i class="material-icons">highlight</i></button>
-				<button type="button" class="btn btn-small" onclick="addBetweenSelectedText('message', '[spoilers]', '[/spoilers]')"><i class="material-icons">remove_red_eye</i></button>
-				<button type="button" class="btn btn-small" onclick="alert('Indisponible')"><i class="material-icons">poll</i></button>
-				<button type="button" class="btn btn-small" onclick="alert('Indisponible')"><i class="material-icons">insert_emoticon</i></button>
-				<textarea name="message" id="message" class="materialize-textarea" placeholder="Contenu de votre message"><?=isset($_POST["message"]) && is_string($_POST["message"]) ? htmlspecialchars($_POST["message"]) : ""?></textarea>
+				<button type="button" class="btn btn-small" onclick="addBetweenSelectedText('content', '[b]', '[/b]')"><i class="material-icons">format_bold</i></button>
+				<button type="button" class="btn btn-small" onclick="addBetweenSelectedText('content', '[i]', '[/i]')"><i class="material-icons">format_italic</i></button>
+				<button type="button" class="btn btn-small" onclick="addBetweenSelectedText('content', '[s]', '[/s]')"><i class="material-icons">indeterminate_check_box</i></button>
+				<button type="button" class="btn btn-small" onclick="addBetweenSelectedText('content', '[u]', '[/u]')"><i class="material-icons">highlight</i></button>
+				<button type="button" class="btn btn-small" onclick="addBetweenSelectedText('content', '[spoilers]', '[/spoilers]')"><i class="material-icons">remove_red_eye</i></button>
+				<button type="button" class="btn btn-small modal-trigger" href="#modal1"><i class="material-icons">image</i></button>
+				<textarea name="content" id="content" class="materialize-textarea" placeholder="Contenu de votre message"><?=isset($_POST["content"]) && is_string($_POST["content"]) ? htmlspecialchars($_POST["content"]) : ""?></textarea>
 			</div>
 			<div class="input-field">
 				<?=Captcha::generate()?>
@@ -193,6 +203,31 @@ if (isset($messages)) {
 			</div>
 		</div>
 	</div>
+	
+	<div id="modal1" class="modal">
+		<div class="modal-content">
+			<h4>Rechercher un sticker</h4>
+			<input type="text" placeholder="Tags" onkeyup="searchSticker(this.value)"><br><br>
+			
+			<div class="row" id="stickers">
+			</div>
+		</div>
+		
+		<div class="modal-footer">
+			<a class="modal-close waves-effect waves-green btn-flat">Fermer</a>
+		</div>
+	</div>
+<?php
+} else {
+?>
+	<div class="card orange white-text">
+		<div class="card-content">
+			Vous devez être connecté afin de pouvoir répondre à un sujet.
+		</div>
+	</div>
+<?php
+}
+?>
 </form>
 
 <?php

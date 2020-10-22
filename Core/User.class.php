@@ -17,15 +17,16 @@ class User {
 	public function getData() : array {
 		global $db;
 		
-		$query = $db->prepare("SELECT username, messages, points, avatar FROM users WHERE id = :id");
+		$query = $db->prepare("SELECT username, messages, points, avatar, admin FROM users WHERE id = :id");
 		$query->bindValue(":id", $this->id, PDO::PARAM_INT);
 		$query->execute();
 		$data = $query->fetch();
 		$result = [
-			"username" => (string)$data["username"],
+			"username" => (string)trim($data["username"]),
 			"messages" => (int)$data["messages"],
 			"points" => (int)$data["points"],
-			"avatar" => (int)$data["avatar"]
+			"avatar" => (int)$data["avatar"],
+			"admin" => (int)$data["admin"]
 		];
 		
 		return $result;

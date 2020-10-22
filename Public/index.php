@@ -13,9 +13,17 @@ require "Core/Session.class.php";
 require "Core/User.class.php";
 require "Core/Init.php";
 
+register_shutdown_function("renderPage");
+ob_start();
+
 foreach ($routes as $route=>$handlerName) {
 	if (preg_match($route, $_SERVER["REQUEST_URI"], $match)) {
 		unset($match[0]);
+		
+		$api = explode("_", $handlerName)[0] == "Api";
+		if ($api) {
+			header("Content-Type: application/json");
+		}
 		
 		require "Handlers/$handlerName";
 		exit;

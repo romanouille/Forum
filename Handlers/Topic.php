@@ -3,6 +3,7 @@ require "Core/Forum.class.php";
 require "Core/Topic.class.php";
 require "Core/Captcha.class.php";
 require "Core/Message.class.php";
+require "Core/Sticker.class.php";
 
 $forumId = Forum::getIdByName($match[1]);
 $topicId = $match[2];
@@ -23,7 +24,7 @@ if (!$topic->exists()) {
 }
 
 $poll = $topic->getPoll();
-$votedOnPoll = $user->votedOnPoll($topicId);
+$votedOnPoll = $userLogged ? $user->votedOnPoll($topicId) : true;
 
 if (isset($match[5]) && isset($match[6]) && !$votedOnPoll && $userData["points"] >= $poll["points"]) {
 	if ($match[6] != $hash) {
@@ -46,13 +47,13 @@ if (isset($match[5]) || $match[4] != $topicSlug) {
 
 if ($userLogged && count($_POST) > 0) {
 	$messages = [];
-	$_POST = array_map("trim", $_POST);
+	$_POST = array_map(function($a) { return is_string($a) ? trim($a) : $a; }, $_POST);
 	
-	if (!isset($_POST["hash"]) || !is_string($_POST["hash"]) || $_POST["hash"] != $hash) {
+	if (!isset($_POST["token"]) || !is_string($_POST["token"]) || $_POST["token"] != $hash) {
 		$messages[] = "Le formulaire est invalide, veuillez réessayer.";
 	}
 	
-	if (!isset($_POST["message"]) || !is_string($_POST["message"]) || empty($_POST["message"])) {
+	if (!isset($_POST["content"]) || !is_string($_POST["content"]) || empty(trim($_POST["content"]))) {
 		$messages[] = "Vous devez spécifier le contenu de votre message.";
 	}
 	
@@ -62,7 +63,7 @@ if ($userLogged && count($_POST) > 0) {
 	
 	if (empty($messages)) {
 		$topic = new Topic($forumId, $topicId);
-		$messageId = $topic->createMessage($sessionData["user_id"], $_POST["message"]);
+		$messageId = $topic->createMessage($sessionData["user_id"], $_POST["content"]);
 		
 		header("Location: /forums/{$match[1]}/$topicId-".$topic->getPagesNb()."-".slug($topicTitle)."#message_$messageId");
 		exit;

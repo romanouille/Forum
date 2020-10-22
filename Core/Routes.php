@@ -9,9 +9,11 @@ $routes = [
 	"#^\/forums\/(.+)/([0-9]+)$#" => "Forum.php",
 	"#^\/forums\/(.+)\/([0-9]+)\?mode=search&content=(.+)&type=(.+)$#" => "Forum.php",
 	"#^\/forums\/(.+)\/([0-9]+)-([0-9]+)-(.+)\?poll_response=([0-9]+)&token=(.+)$#" => "Topic.php",
+	"#^\/forums\/(.+)\/([0-9]+)-([0-9]+)-(.+)\?edit_message=([0-9]+)#" => "Topic_edit_message.php",
 	"#^\/forums\/(.+)\/([0-9]+)-([0-9]+)-(.+)$#" => "Topic.php",
 	"#^\/pm\/$#" => "Pm_list.php",
 	"#^\/pm\/([0-9]+)$#" => "Pm_list.php",
-	"#^\/pm\/([0-9]+)-([0-9]+)-(.+)$#" => "Pm.php",
-	"#^\/api\/polls\/create$#" => "Api_poll_create.php"
+	"#^\/pm\/([0-9]+)-([0-9]+)$#" => "Pm.php",
+	"#^\/api\/stickers\/search$#" => "Api_stickers_search.php",
+	"#^\/account\/extendedaccess$#" => "Auth_extended_access.php"
 ];

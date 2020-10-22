@@ -28,6 +28,7 @@ class Pm {
 		$query->bindValue(":author", $author, PDO::PARAM_INT);
 		$query->execute();
 		$pmId = $db->lastInsertId();
+		$pm = new Pm($pmId);
 		
 		foreach ($receivers as $receiver) {
 			$query = $db->prepare("INSERT INTO pm_receivers(pm_id, user_id, timestamp) VALUES(:pm_id, :user_id, :timestamp)");
@@ -36,6 +37,8 @@ class Pm {
 			$query->bindValue(":timestamp", time(), PDO::PARAM_INT);
 			$query->execute();
 		}
+		
+		$pm->createMessage($author, $content);
 		
 		return $pmId;
 	}
@@ -56,6 +59,17 @@ class Pm {
 		return $data["nb"] == 1;
 	}
 	
+	public function getTitle() : string {
+		global $db;
+		
+		$query = $db->prepare("SELECT title FROM pm WHERE id = :id");
+		$query->bindValue(":id", $this->id, PDO::PARAM_INT);
+		$query->execute();
+		$data = $query->fetch();
+		
+		return trim($data["title"]);
+	}
+	
 	/**
 	 * Vérifie si un utilisatuer est dans le MP
 	 *
@@ -73,5 +87,50 @@ class Pm {
 		$data = $query->fetch();
 		
 		return $data["nb"] == 1;
+	}
+	
+	public function createMessage(int $author, string $content) : int {
+		global $db;
+		
+		$query = $db->prepare("INSERT INTO pm_messages(pm, author, content, timestamp) VALUES(:pm, :author, :content, ".time().")");
+		$query->bindValue(":pm", $this->id, PDO::PARAM_INT);
+		$query->bindValue(":author", $author, PDO::PARAM_INT);
+		$query->bindValue(":content", $content, PDO::PARAM_STR);
+		$query->execute();
+		
+		return $db->lastInsertId();
+	}
+	
+	public function getMessages(int $page) : array {
+		global $db;
+		
+		$query = $db->prepare("SELECT id, author, (SELECT username FROM users WHERE id = author) AS username, content, timestamp FROM pm_messages WHERE pm = :pm ORDER BY timestamp ASC LIMIT 20 OFFSET ".(($page-1)*20));
+		$query->bindValue(":pm", $this->id, PDO::PARAM_INT);
+		$query->execute();
+		$data = $query->fetchAll();
+		$result = [];
+		
+		foreach ($data as $value) {
+			$result[] = [
+				"id" => (int)$value["id"],
+				"author" => (int)$value["author"],
+				"username" => (string)trim($value["username"]),
+				"content" => (string)trim($value["content"]),
+				"timestamp" => (int)$value["timestamp"]
+			];
+		}
+		
+		return $result;
+	}
+	
+	public function getPagesNb() : int {
+		global $db;
+		
+		$query = $db->prepare("SELECT COUNT(*) AS nb FROM pm_messages WHERE pm = :pm");
+		$query->bindValue(":pm", $this->id, PDO::PARAM_INT);
+		$query->execute();
+		$data = $query->fetch();
+		
+		return ceil($data["nb"]/20);
 	}
 }

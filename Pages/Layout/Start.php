@@ -30,7 +30,10 @@ main {
 }
 
 body {
-	background: grey
+	background-color:#273035;
+	background-image:url(<?=$staticServer?>/img/background.jpg);
+	background-repeat:no-repeat;
+	background-position:center top
 }
 
 .nav-logo img {
@@ -210,6 +213,19 @@ img {
 textarea {
 	height:150px !important
 }
+
+.message .message-content img, #stickers img {
+	width:68px;
+	height:51px
+}
+
+#stickers img {
+	cursor:pointer
+}
+
+nav i {
+	margin-top:4px
+}
 		</style>
 	</head>
 	
@@ -226,15 +242,21 @@ textarea {
 					<ul>
 						<li class="nav-logo"><a href="/" title="Accueil"><img src="<?=$staticServer?>/img/Logo.png" alt="Avenoel" title="Logo d'Avenoel"></a>
 						<li><a href="/" title="Accueil">Accueil</a>
-						<li><a href="/forums/blabla/1" title="Blabla général">Forum</a>
+						<li><a href="/forums/blabla-general/1" title="Blabla général">Forum</a>
 						<li><a href="/articles" title="Articles">Articles</a>
 					</ul>
 					
 					<ul class="right">
 <?php
 if ($userLogged) {
+	if ($userData["admin"] >= 1) {
 ?>
-						<li><a href="/account/<?=$userData["username"]?>" title="Profil de <?=$userData["username"]?>"><?=$userData["username"]?></a>
+						<li><a href="/account/extendedaccess" title="Accès étendu">Accès étendu</a>
+<?php
+	}
+?>
+						<li><a href="/user/<?=$userData["username"]?>" title="Profil de <?=$userData["username"]?>"><?=$userData["username"]?></a>
+						<li><a href="/pm/" title="Messages privés"><i class="material-icons">message</i></a>
 						<li><a href="/account/logout?hash=<?=$hash?>" title="Déconnexion">Déconnexion</a>
 <?php
 } else {
@@ -268,6 +290,7 @@ if ($userLogged) {
 foreach ($breadcrumb as $value) {
 ?>
 								<li><?=$value?>
+
 <?php
 }
 ?>

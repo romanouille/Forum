@@ -38,9 +38,9 @@ if ($page < $pagesNb) {
 foreach ($pmList as $pm) {
 ?>
 		<tr>
-			<td><a href="/pm/<?=$pm["id"]?>-1-<?=slug($pm["title"])?>" title="<?=htmlspecialchars($pm["title"])?>"><?=htmlspecialchars($pm["title"])?></a>
+			<td><a href="/pm/<?=$pm["id"]?>-1" title="<?=htmlspecialchars($pm["title"])?>"><?=htmlspecialchars($pm["title"])?></a>
 			<td><?=$pm["username"]?>
-			<td><?=date("d/m/Y à H:i:s", $pm["timestamp"])?>
+			<td class="hide-on-med-and-down"><?=date("d/m/Y à H:i:s", $pm["timestamp"])?>
 <?php
 }
 ?>
@@ -72,7 +72,7 @@ if ($page < $pagesNb) {
 </div>
 
 <form method="post">
-	<input type="hidden" name="hash" value="<?=$hash?>">
+	<input type="hidden" name="token" value="<?=$hash?>">
 	
 	<h5>Nouveau message privé</h5>
 	
@@ -91,9 +91,9 @@ if (isset($messages)) {
 	<div class="row">
 		<div class="col s12 m10">
 			<div class="input-field">
-				<input type="text" name="title" id="title" placeholder="Titre du message" value="<?=isset($_POST["title"]) && is_string($_POST["title"]) ? htmlspecialchars($_POST["title"]) : ""?>">
+				<input type="text" name="title" id="title" placeholder="Titre du MP" value="<?=isset($_POST["title"]) && is_string($_POST["title"]) ? htmlspecialchars($_POST["title"]) : ""?>">
 				<label for="title">
-					Titre du message
+					Titre du MP
 				</label>
 			</div>
 
@@ -105,9 +105,15 @@ if (isset($messages)) {
 			</div>
 
 
-			<div class="input-field">
-				<textarea name="message" id="message" class="materialize-textarea" placeholder="Contenu de votre message"><?=isset($_POST["message"]) && is_string($_POST["message"]) ? htmlspecialchars($_POST["message"]) : ""?></textarea>
-				<label for="message">Contenu de votre message</label>
+			<div class="input-field"><br>
+				<button type="button" class="btn btn-small" onclick="addBetweenSelectedText('content', '[b]', '[/b]')"><i class="material-icons">format_bold</i></button>
+				<button type="button" class="btn btn-small" onclick="addBetweenSelectedText('content', '[i]', '[/i]')"><i class="material-icons">format_italic</i></button>
+				<button type="button" class="btn btn-small" onclick="addBetweenSelectedText('content', '[s]', '[/s]')"><i class="material-icons">indeterminate_check_box</i></button>
+				<button type="button" class="btn btn-small" onclick="addBetweenSelectedText('content', '[u]', '[/u]')"><i class="material-icons">highlight</i></button>
+				<button type="button" class="btn btn-small" onclick="addBetweenSelectedText('content', '[spoilers]', '[/spoilers]')"><i class="material-icons">remove_red_eye</i></button>
+				<button type="button" class="btn btn-small modal-trigger" href="#modal1"><i class="material-icons">image</i></button>
+				<textarea name="message" id="message" class="materialize-textarea" placeholder="Contenu de votre MP"><?=isset($_POST["message"]) && is_string($_POST["message"]) ? htmlspecialchars($_POST["message"]) : ""?></textarea>
+				<label for="message">Contenu de votre MP</label>
 			</div>
 			<div class="input-field">
 				<?=Captcha::generate()?>
@@ -116,6 +122,20 @@ if (isset($messages)) {
 				<button type="submit" class="btn green waves-effect waves-light">Valider</button>
 				<button type="button" class="btn waves-effect waves-light">Prévisualiser</button>
 			</div>
+		</div>
+	</div>
+	
+	<div id="modal1" class="modal">
+		<div class="modal-content">
+			<h4>Rechercher un sticker</h4>
+			<input type="text" placeholder="Tags" onkeyup="searchSticker(this.value)"><br><br>
+			
+			<div class="row" id="stickers">
+			</div>
+		</div>
+		
+		<div class="modal-footer">
+			<a class="modal-close waves-effect waves-green btn-flat">Fermer</a>
 		</div>
 	</div>
 </form>

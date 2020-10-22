@@ -1,7 +1,5 @@
 <?php
 class Mail {
-	const mailDomain = "mail.skymote.io", websiteName = "Skymote", mailSource = "ne-pas-repondre@mail.skymote.io", mailPrivateApiKey = "key-b28e6f0e03ad376bfe000e261c2dbd9f";
-	
 	/**
 	 * Envoie un mail
 	 *
@@ -12,10 +10,10 @@ class Mail {
 	 * @return bool Résultat
 	 */
 	public static function send(string $to, string $subject, string $body) : bool {
-		global $websiteName;
+		global $config;
 		
 		$post = [
-			"from" => self::websiteName." <".self::mailSource.">",
+			"from" => "{$config["mail"]["website_name"]} <{$config["mail"]["mail_source"]}>",
 			"to" => $to,
 			"subject" => $subject,
 			"text" => $body
@@ -26,7 +24,7 @@ class Mail {
 		curl_setopt($curl, CURLOPT_USERAGENT, "");
 		curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
 		curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
-		curl_setopt($curl, CURLOPT_USERPWD, "api:".self::mailPrivateApiKey);
+		curl_setopt($curl, CURLOPT_USERPWD, "api:{$config["mail"]["private_key"]}");
 		curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
 		curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query($post));
 		curl_setopt($curl, CURLOPT_HEADER, true);

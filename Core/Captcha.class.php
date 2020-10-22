@@ -1,14 +1,14 @@
 <?php
 class Captcha {
-	private static $publicKey = "6LcB-AAVAAAAAHbASxkzohCi209I_Voy7fQ2SouZ", $privateKey = "6LcB-AAVAAAAAMMrPhZxxHxmeIxQZZogobc3J3Ek";
-
 	/**
 	 * Génère un captcha
 	 *
 	 * @param string $center Aligne le captcha au centre
 	 */
 	public static function generate(bool $center = false) {
-		echo "<div class=\"g-recaptcha".($center ? " captcha-center" : "")."\" data-sitekey=\"".self::$publicKey."\"></div>\n";
+		global $config;
+		
+		echo "<div class=\"g-recaptcha".($center ? " captcha-center" : "")."\" data-sitekey=\"".$config["recaptcha"]["public_key"]."\"></div>\n";
 	}
 	
 	/**
@@ -16,7 +16,9 @@ class Captcha {
 	 *
 	 * @return bool Résultat
 	 */
-	public static function check() : bool {		
+	public static function check() : bool {
+		global $config;
+		
 		if (!isset($_POST["g-recaptcha-response"]) || empty($_POST["g-recaptcha-response"])) {
 			return false;
 		}
@@ -28,7 +30,7 @@ class Captcha {
 		curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
 		curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
 		curl_setopt($curl, CURLOPT_USERAGENT, "");
-		curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query(["secret" => self::$privateKey, "response" => $_POST["g-recaptcha-response"], "remoteip" => $_SERVER["REMOTE_ADDR"]]));
+		curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query(["secret" => $config["recaptcha"]["private_key"], "response" => $_POST["g-recaptcha-response"], "remoteip" => $_SERVER["REMOTE_ADDR"]]));
 		curl_setopt($curl, CURLOPT_HTTPHEADER, ["X-Forwarded-For: {$_SERVER["REMOTE_ADDR"]}"]);
 		curl_setopt($curl, CURLOPT_TIMEOUT, 3);
 		curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);

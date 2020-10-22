@@ -58,9 +58,9 @@ class Forum {
 			
 			$query = $db->prepare("SELECT id, author, (SELECT username FROM users WHERE id = author) AS username, title, replies, last_message_timestamp, pinned, locked, deleted FROM topics WHERE forum = :forum AND author IN (".implode(",", $result).") ORDER BY last_message_timestamp DESC LIMIT 25 OFFSET ".(($page-1)*25));
 		} elseif ($searchType == 3) {
-			$query = $db->prepare("SELECT id, topic, message, (SELECT username FROM users WHERE id = author) AS username, timestamp FROM messages WHERE forum = :forum AND message ILIKE :message AND message NOT ILIKE '[quote:%]' ORDER BY timestamp DESC LIMIT 25 OFFSET ".(($page-1)*25));
+			$query = $db->prepare("SELECT id, topic, content, (SELECT username FROM users WHERE id = author) AS message_username, timestamp FROM messages WHERE forum = :forum AND content ILIKE :content AND content NOT ILIKE '[quote:%]' ORDER BY timestamp DESC LIMIT 25 OFFSET ".(($page-1)*25));
 			$query->bindValue(":forum", $this->id, PDO::PARAM_INT);
-			$query->bindValue(":message", "%$searchData%", PDO::PARAM_STR);
+			$query->bindValue(":content", "%$searchData%", PDO::PARAM_STR);
 			$query->execute();
 			$data = $query->fetchAll();
 			
@@ -73,12 +73,12 @@ class Forum {
 				$result[$nb] = [
 					"id" => (int)$value["id"],
 					"topic" => (int)$value["topic"],
-					"message" => (string)trim($value["message"]),
-					"username" => (string)trim($value["username"]),
+					"content" => (string)trim($value["content"]),
+					"message_username" => (string)trim($value["message_username"]),
 					"message_timestamp" => (int)$value["timestamp"]
 				];
 				
-				$query = $db->prepare("SELECT id, title, replies, last_message_timestamp, pinned, locked, deleted FROM topics WHERE id = :id");
+				$query = $db->prepare("SELECT id, title, (SELECT username FROM users WHERE id = author) AS topic_username, replies, last_message_timestamp, pinned, locked, deleted FROM topics WHERE id = :id");
 				$query->bindValue(":id", (int)$value["topic"], PDO::PARAM_INT);
 				$query->execute();
 				$data2 = $query->fetch();
@@ -86,6 +86,7 @@ class Forum {
 				$result[$nb] = array_merge($result[$nb], [
 					"id" => (int)$data2["id"],
 					"title" => (string)trim($data2["title"]),
+					"topic_username" => (string)$data2["topic_username"],
 					"replies" => (int)$data2["replies"],
 					"last_message_timestamp" => (int)$data2["last_message_timestamp"],
 					"pinned" => (bool)$data2["pinned"],
@@ -108,7 +109,7 @@ class Forum {
 			$result[] = [
 				"id" => (int)$value["id"],
 				"author" => (int)$value["author"],
-				"username" => (string)$value["username"],
+				"topic_username" => (string)trim($value["username"]),
 				"title" => (string)trim($value["title"]),
 				"replies" => (int)$value["replies"],
 				"last_message_timestamp" => (int)$value["last_message_timestamp"],
@@ -156,9 +157,9 @@ class Forum {
 			$query = $db->prepare("SELECT COUNT(*) AS nb FROM topics WHERE forum = :forum AND author IN (".implode(",", $result).")");
 			$query->bindValue(":forum", $forumId, PDO::PARAM_INT);
 		} elseif ($searchType == 3) {
-			$query = $db->prepare("SELECT COUNT(*) AS nb FROM messages WHERE forum = :forum AND message ILIKE :message AND message NOT ILIKE '[quote:%]'");
+			$query = $db->prepare("SELECT COUNT(*) AS nb FROM messages WHERE forum = :forum AND content ILIKE :content AND content NOT ILIKE '[quote:%]'");
 			$query->bindValue(":forum", $forumId, PDO::PARAM_INT);
-			$query->bindValue(":message", "%$searchData%", PDO::PARAM_STR);
+			$query->bindValue(":content", "%$searchData%", PDO::PARAM_STR);
 		}
 			
 		$query->execute();
@@ -177,8 +178,8 @@ class Forum {
 	public static function getIdByName(string $name) : int {
 		global $db;
 		
-		$query = $db->prepare("SELECT id FROM forums WHERE LOWER(name) = LOWER(:name)");
-		$query->bindValue(":name", $name, PDO::PARAM_STR);
+		$query = $db->prepare("SELECT id FROM forums WHERE slug = :slug");
+		$query->bindValue(":slug", $name, PDO::PARAM_STR);
 		$query->execute();
 		$data = $query->fetch();
 		

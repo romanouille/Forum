@@ -97,17 +97,17 @@ foreach ($topics as $topic) {
 ?>
 	
 			<td><a href="/forums/<?=$match[1]?>/<?=$topic["id"]?>-1-<?=slug($topic["title"])?>" title="<?=htmlspecialchars($topic["title"])?>"><?=$topic["title"]?></a>
-			<td><a href="/user/<?=$topic["username"]?>"><?=$topic["username"]?></a>
+			<td><a href="/user/<?=$topic["topic_username"]?>" target="_blank"><?=$topic["topic_username"]?></a>
 			<td class="hide-on-med-and-down"><?=$topic["replies"]?>
 			<td class="hide-on-med-and-down"><?=date("d/m H:i:s", $topic["last_message_timestamp"])?>
 			<td>
 <?php
-	if (isset($topic["message"])) {
+	if (isset($topic["content"])) {
 ?>
 			<tr>
 				<td>
-				<td><?=$topic["message"]?>
-				<td>
+				<td><?=htmlspecialchars($topic["content"])?>
+				<td><a href="/user/<?=$topic["message_username"]?>" target="_blank"><?=$topic["message_username"]?></a>
 				<td class="hide-on-med-and-down">
 				<td class="hide-on-med-and-down"><?=date("d/m H:i:s", $topic["message_timestamp"])?>
 				<td>
@@ -165,12 +165,13 @@ if ($page < $pagesNb) {
 </div>
 
 <form method="post">
-	<input type="hidden" name="hash" value="<?=$hash?>">
+	<input type="hidden" name="token" value="<?=$hash?>">
 	
 	<h5>Nouveau sujet</h5>
 	
 <?php
-if (isset($messages)) {
+if ($userLogged) {
+	if (isset($messages)) {
 ?>
 	<div class="card blue white-text">
 		<div class="card-content">
@@ -178,7 +179,7 @@ if (isset($messages)) {
 		</div>
 	</div>
 <?php
-}
+	}
 ?>
 	
 	<div class="row">
@@ -200,8 +201,8 @@ if (isset($messages)) {
 					</label>
 				</div>
 <?php
-if (isset($_POST["poll_question"]) && is_string($_POST["poll_question"]) && isset($_POST["poll_responses"])) {
-	foreach ($_POST["poll_responses"] as $value) {
+	if (isset($_POST["poll_question"]) && is_string($_POST["poll_question"]) && isset($_POST["poll_responses"])) {
+		foreach ($_POST["poll_responses"] as $value) {
 ?>
 				<div class="input-field">
 					<input type="text" name="poll_responses[]" placeholder="Saisissez une réponse" value="<?=is_string($value) ? htmlspecialchars($value) : ""?>">
@@ -210,8 +211,8 @@ if (isset($_POST["poll_question"]) && is_string($_POST["poll_question"]) && isse
 					</label>
 				</div>
 <?php
-	}
-} else {
+		}
+	} else {
 ?>
 				<div class="input-field">
 					<input type="text" name="poll_responses[]" placeholder="Saisissez une réponse">
@@ -226,7 +227,7 @@ if (isset($_POST["poll_question"]) && is_string($_POST["poll_question"]) && isse
 					</label>
 				</div>
 <?php
-}
+	}
 ?>
 			</div><br><br>
 			
@@ -237,17 +238,17 @@ if (isset($_POST["poll_question"]) && is_string($_POST["poll_question"]) && isse
 				</label>
 			</div>
 			<div class="input-field"><br>
-				<button type="button" class="btn btn-small" onclick="addBetweenSelectedText('message', '[b]', '[/b]')"><i class="material-icons">format_bold</i></button>
-				<button type="button" class="btn btn-small" onclick="addBetweenSelectedText('message', '[i]', '[/i]')"><i class="material-icons">format_italic</i></button>
-				<button type="button" class="btn btn-small" onclick="addBetweenSelectedText('message', '[s]', '[/s]')"><i class="material-icons">indeterminate_check_box</i></button>
-				<button type="button" class="btn btn-small" onclick="addBetweenSelectedText('message', '[u]', '[/u]')"><i class="material-icons">highlight</i></button>
-				<button type="button" class="btn btn-small" onclick="addBetweenSelectedText('message', '[spoilers]', '[/spoilers]')"><i class="material-icons">remove_red_eye</i></button>
-				<button type="button" class="btn btn-small" onclick="alert('Indisponible')"><i class="material-icons">insert_emoticon</i></button>
+				<button type="button" class="btn btn-small" onclick="addBetweenSelectedText('content', '[b]', '[/b]')"><i class="material-icons">format_bold</i></button>
+				<button type="button" class="btn btn-small" onclick="addBetweenSelectedText('content', '[i]', '[/i]')"><i class="material-icons">format_italic</i></button>
+				<button type="button" class="btn btn-small" onclick="addBetweenSelectedText('content', '[s]', '[/s]')"><i class="material-icons">indeterminate_check_box</i></button>
+				<button type="button" class="btn btn-small" onclick="addBetweenSelectedText('content', '[u]', '[/u]')"><i class="material-icons">highlight</i></button>
+				<button type="button" class="btn btn-small" onclick="addBetweenSelectedText('content', '[spoilers]', '[/spoilers]')"><i class="material-icons">remove_red_eye</i></button>
+				<button type="button" class="btn btn-small modal-trigger" href="#modal1"><i class="material-icons">image</i></button>
 				
 				
 				
-				<textarea name="message" id="message" class="materialize-textarea" placeholder="Contenu de votre sujet"><?=isset($_POST["message"]) && is_string($_POST["message"]) ? htmlspecialchars($_POST["message"]) : ""?></textarea>
-				<label for="message">Contenu de votre sujet</label>
+				<textarea name="content" id="content" class="materialize-textarea" placeholder="Contenu de votre sujet"><?=isset($_POST["content"]) && is_string($_POST["content"]) ? htmlspecialchars($_POST["content"]) : ""?></textarea>
+				<label for="content">Contenu de votre sujet</label>
 			</div>
 			<div class="input-field">
 				<?=Captcha::generate()?>
@@ -259,6 +260,31 @@ if (isset($_POST["poll_question"]) && is_string($_POST["poll_question"]) && isse
 			</div>
 		</div>
 	</div>
+	
+	<div id="modal1" class="modal">
+		<div class="modal-content">
+			<h4>Rechercher un sticker</h4>
+			<input type="text" placeholder="Tags" onkeyup="searchSticker(this.value)"><br><br>
+			
+			<div class="row" id="stickers">
+			</div>
+		</div>
+		
+		<div class="modal-footer">
+			<a class="modal-close waves-effect waves-green btn-flat">Fermer</a>
+		</div>
+	</div>
+<?php
+} else {
+?>
+	<div class="card orange white-text">
+		<div class="card-content">
+			Vous devez être connecté afin de créer un nouveau sujet.
+		</div>
+	</div>
+<?php
+}
+?>
 </form>
 
 <?php

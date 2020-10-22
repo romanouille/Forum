@@ -1,10 +1,7 @@
 <?php
-if ($devMode) {
-	$db = new PDO("pgsql:dbname=avenoel;host=localhost", "postgres", "azerty");
-} else {
-	$db = new PDO("pgsql:dbname=avenoel;host=localhost", "postgres", "azerty", [PDO::ATTR_PERSISTENT => true]);
-}
+$config = parse_ini_file(".env", true);
 
+$db = new PDO("pgsql:host={$config["db"]["server"]};dbname={$config["db"]["name"]}", $config["db"]["username"], $config["db"]["password"], [PDO::ATTR_PERSISTENT => true]);
 $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
 $staticServer = "http://127.0.0.5";

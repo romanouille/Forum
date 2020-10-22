@@ -2,14 +2,18 @@
 require "Core/Captcha.class.php";
 require "Core/Pm.class.php";
 
+if (!$userLogged) {
+	header("Location: /forums/blabla-general/1");
+	exit;
+}
 
 $page = isset($match[1]) ? $match[1] : 1;
 
 if (count($_POST) > 0) {
 	$messages = [];
-	$_POST = array_map("trim", $_POST);
+	$_POST = array_map(function($a) { return is_string($a) ? trim($a) : $a; }, $_POST);
 	
-	if (!isset($_POST["hash"]) || !is_string($_POST["hash"]) || $_POST["hash"] != $hash) {
+	if (!isset($_POST["token"]) || !is_string($_POST["token"]) || $_POST["token"] != $hash) {
 		$messages[] = "Le formulaire est invalide, veuillez réessayer.";
 	}
 	
@@ -27,7 +31,7 @@ if (count($_POST) > 0) {
 		foreach ($receivers as $receiverUsername) {
 			if (!User::exists($receiverUsername)) {
 				$messages[] = "Le pseudo ".htmlspecialchars($receiverUsername)." n'existe pas.";
-			} elseif (strtolower($receiverUsername) == strtolower($_SESSION["username"])) {
+			} elseif (strtolower($receiverUsername) == strtolower($userData["username"])) {
 				$messages[] = "Vous ne pouvez pas envoyer de MP à vous-même.";
 			}
 		}
@@ -43,15 +47,15 @@ if (count($_POST) > 0) {
 	
 	if (empty($messages)) {
 		$receivers = explode(",", $_POST["receivers"]);
-		$usersId = [$_SESSION["userId"]];
+		$usersId = [$sessionData["user_id"]];
 		
 		foreach ($receivers as $receiver) {
 			$usersId[] = User::getIdByUsername($receiver);
 		}
 		
-		$pmId = Pm::create($_SESSION["userId"], $_POST["title"], $usersId, $_POST["message"]);
+		$pmId = Pm::create($sessionData["user_id"], $_POST["title"], $usersId, $_POST["message"]);
 		
-		header("Location: /pm/$pmId-1-".slug($_POST["title"]));
+		header("Location: /pm/$pmId-1");
 		exit;
 	}
 }
@@ -64,6 +68,8 @@ if ($page > $pagesNb && $page > 1) {
 }
 
 $pmList = $user->getPmList($page);
+
+$breadcrumb = ["Messages privés", "Page $page"];
 
 
 require "Pages/Pm_list.php";

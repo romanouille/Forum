@@ -18,12 +18,6 @@ if (!$forum->exists()) {
 	require "Handlers/Error.php";
 }
 
-$forumName = $forum->getName();
-if (strtolower($forumName) != $match[1]) {
-	http_response_code(404);
-	require "Handlers/Error.php";
-}
-
 
 if (isset($match[3]) && isset($match[4]) && is_string($match[3]) && is_string($match[4])) {
 	$isSearch = true;
@@ -60,7 +54,7 @@ if ($userLogged && count($_POST) > 0) {
 	$poll = false;
 	$_POST = array_map(function($a) { return is_string($a) ? trim($a) : $a; }, $_POST);
 	
-	if (!isset($_POST["hash"]) || !is_string($_POST["hash"]) || $_POST["hash"] != $hash) {
+	if (!isset($_POST["token"]) || !is_string($_POST["token"]) || $_POST["token"] != $hash) {
 		$messages[] = "Le formulaire est invalide, veuillez réessayer.";
 	}
 	
@@ -70,7 +64,7 @@ if ($userLogged && count($_POST) > 0) {
 		$messages[] = "Le titre de votre sujet doit se composer d'au minimum 1 caractères et d'au maximlum 100 acaractères.";
 	}
 	
-	if (!isset($_POST["message"]) || !is_string($_POST["message"]) || empty($_POST["message"])) {
+	if (!isset($_POST["content"]) || !is_string($_POST["content"]) || empty($_POST["content"])) {
 		$messages[] = "Vous devez spécifier le contenu de votre sujet.";
 	}
 	
@@ -101,7 +95,7 @@ if ($userLogged && count($_POST) > 0) {
 	}
 	
 	if (empty($messages)) {
-		$topicId = Topic::create($forumId, $sessionData["user_id"], $_POST["title"], $_POST["message"]);
+		$topicId = Topic::create($forumId, $sessionData["user_id"], $_POST["title"], $_POST["content"]);
 		if (!empty($_POST["poll_question"])) {
 			Poll::create($topicId, $_POST["poll_question"], $_POST["poll_points"], $_POST["poll_responses"]);
 		}
@@ -112,6 +106,6 @@ if ($userLogged && count($_POST) > 0) {
 }
 
 
-$breadcrumb = ["Forum ".htmlspecialchars($forumName), "Page $page"];
+$breadcrumb = ["Forum ".htmlspecialchars($forum->getName()), "Page $page"];
 
 require "Pages/Forum.php";

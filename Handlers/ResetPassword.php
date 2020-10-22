@@ -2,7 +2,7 @@
 require "Core/Captcha.class.php";
 
 if ($userLogged) {
-	header("Location: /");
+	header("Location: /forums/blabla-general/1");
 	exit;
 }
 
@@ -16,6 +16,9 @@ if ($userId == 0) {
 }
 
 if (count($_POST) > 0) {
+	$messages = [];
+	$_POST = array_map(function($a) { return is_string($a) ? trim($a) : $a; }, $_POST);
+	
 	if (!isset($_POST["password"]) || !is_string($_POST["password"]) || empty($_POST["password"])) {
 		$messages[] = "Vous devez spécifier votre mot de passe.";
 	} elseif (strlen($_POST["password"]) < 8 || strlen($_POST["password"]) > 72) {
@@ -30,7 +33,7 @@ if (count($_POST) > 0) {
 	
 	if (empty($messages)) {
 		Session::create($userId);
-		header("Location: /forums/blabla/1");
+		header("Location: /forums/blabla-general/1");
 		exit;
 	}
 }

@@ -2,12 +2,13 @@
 require "Core/Captcha.class.php";
 
 if ($userLogged) {
-	header("Location: /forums/blabla/1");
+	header("Location: /forums/blabla-general/1");
 	exit;
 }
 
 if (count($_POST) > 0) {
 	$messages = [];
+	$_POST = array_map(function($a) { return is_string($a) ? trim($a) : $a; }, $_POST);
 	
 	if (!isset($_POST["username"]) || !is_string($_POST["username"]) || empty($_POST["username"])) {
 		$messages[] = "Vous devez spécifier votre pseudo.";
@@ -45,7 +46,7 @@ if (count($_POST) > 0) {
 		$userId = User::create($_POST["username"], $_POST["email"], $_POST["password"]);
 		Session::create($userId);
 		
-		header("Location: /forums/blabla/1");
+		header("Location: /forums/blabla-general/1");
 		exit;
 	}
 }
