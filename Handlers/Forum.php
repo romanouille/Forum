@@ -23,7 +23,7 @@ if (isset($match[3]) && isset($match[4]) && is_string($match[3]) && is_string($m
 	$isSearch = true;
 	// C'est une recherche
 	
-	$searchText = $match[3];
+	$searchText = urldecode($match[3]);
 	
 	if ($match[4] == "title") {
 		$searchType = 1;

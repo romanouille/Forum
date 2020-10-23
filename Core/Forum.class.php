@@ -37,6 +37,14 @@ class Forum {
 	public function getTopics(int $page, int $searchType = 0, string $searchData = "") : array {
 		global $db;
 		
+		if (strstr($searchData, "%")) {
+			$searchData = str_replace("%", "", $searchData);
+			
+			if (empty($searchData)) {
+				return [];
+			}
+		}
+		
 		if ($searchType == 0) {	
 			$query = $db->prepare("SELECT id, author, (SELECT username FROM users WHERE id = author) AS username, title, replies, last_message_timestamp, pinned, locked, deleted FROM topics WHERE forum = :forum ORDER BY last_message_timestamp DESC LIMIT 25 OFFSET ".(($page-1)*25));
 		} elseif ($searchType == 1) {
@@ -133,6 +141,10 @@ class Forum {
 	 */
 	public function getPagesNb(int $searchType = 0, string $searchData = "", int $forumId = 0) : int {
 		global $db;
+		
+		if (strstr($searchData, "%")) {
+			$searchData = str_replace("%", "", $searchData);
+		}
 		
 		if ($searchType == 0) {
 			$query = $db->prepare("SELECT COUNT(*) AS nb FROM topics");
