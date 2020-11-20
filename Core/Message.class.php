@@ -49,7 +49,7 @@ class Message {
 	public function load() : array {
 		global $db;
 		
-		$query = $db->prepare("SELECT topic, author, (SELECT username FROM users WHERE id = author) AS username, timestamp, content FROM messages WHERE id = :id");
+		$query = $db->prepare("SELECT forum, topic, author, (SELECT username FROM users WHERE id = author) AS username, timestamp, content, deleted FROM messages WHERE id = :id");
 		$query->bindValue(":id", $this->id, PDO::PARAM_INT);
 		$query->execute();
 		$data = array_map("trim", $query->fetch());
@@ -75,6 +75,24 @@ class Message {
 		$query = $db->prepare("UPDATE messages SET content = :content, last_edit = ".time().", edited_by = :edited_by WHERE id = :id");
 		$query->bindValue(":content", $content, PDO::PARAM_STR);
 		$query->bindValue(":edited_by", $editedBy, PDO::PARAM_INT);
+		$query->bindValue(":id", $this->id, PDO::PARAM_INT);
+		
+		return $query->execute();
+	}
+	
+	public function delete() : bool {
+		global $db;
+		
+		$query = $db->prepare("UPDATE messages SET deleted = 1 WHERE id = :id");
+		$query->bindValue(":id", $this->id, PDO::PARAM_INT);
+		
+		return $query->execute();
+	}
+	
+	public function restore() : bool {
+		global $db;
+		
+		$query = $db->prepare("UPDATE messages SET deleted = 0 WHERE id = :id");
 		$query->bindValue(":id", $this->id, PDO::PARAM_INT);
 		
 		return $query->execute();

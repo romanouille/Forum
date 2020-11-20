@@ -1,5 +1,6 @@
 <?php
 require "Core/Captcha.class.php";
+require "Core/Message.class.php";
 require "Core/Pm.class.php";
 
 if (!$userLogged) {

@@ -291,4 +291,67 @@ class User {
 		
 		return $query->execute();
 	}
+	
+	public function getExtendedAccessPassword() : string {
+		global $db;
+		
+		$query = $db->prepare("SELECT extended_access_password FROM users WHERE id = :id");
+		$query->bindValue(":id", $this->id, PDO::PARAM_INT);
+		$query->execute();
+		$data = $query->fetch();
+		
+		return trim($data["extended_access_password"]);
+	}
+	
+	public function setAsKicked(int $duration, int $message, int $moderator, string $reason) : bool {
+		global $db;
+		
+		$kickExpiration = time()+($duration*60);
+		$messageData = new Message($message);
+		$messageData = $messageData->load();
+		
+		$query = $db->prepare("INSERT INTO users_kicks(user_id, message, expiration, moderator, reason, forum_id) VALUES(:user_id, :message, $kickExpiration, :moderator, :reason, :forum_id)");
+		$query->bindValue(":user_id", $this->id, PDO::PARAM_INT);
+		$query->bindValue(":message", $message, PDO::PARAM_INT);
+		$query->bindValue(":moderator", $moderator, PDO::PARAM_INT);
+		$query->bindValue(":reason", $reason, PDO::PARAM_STR);
+		$query->bindValue(":forum_id", $messageData["forum"], PDO::PARAM_INT);
+		$query->execute();
+		
+		$forum = new Forum($messageData["forum"]);
+		$forumName = $forum->getName();
+		
+		Pm::create(0, "Vous avez été kické du forum $forumName", [$this->id], "Bonjour,\n\nvotre pseudo a été kické du forum $forumName jusqu'au ".date("d/m/Y à H:i:s", $kickExpiration).".\nLe message ayant causé votre kick est le suivant :\n[quote:$message]\nLe motif du kick est : $reason\n\nCordialement,");
+		
+		return true;
+	}
+	
+	public function unkick(int $forumId) : bool {
+		global $db;
+		
+		$query = $db->prepare("SELECT id FROM users_kicks WHERE expiration > ".time());
+		$query->execute();
+		$data = $query->fetch();
+		
+		if (empty($data)) {
+			return true;
+		}
+		
+		$query = $db->prepare("UPDATE users_kicks SET expiration = 0 WHERE id = :id");
+		$query->bindValue(":id", $data["id"], PDO::PARAM_INT);
+		
+		return $query->execute();
+	}
+	
+	public function isKicked(int $forumId) : bool {
+		global $db;
+		
+		$query = $db->prepare("SELECT COUNT(*) AS nb FROM users_kicks WHERE forum_id = :forum_id AND user_id = :user_id AND expiration > ".time());
+		$query->bindValue(":forum_id", $forumId, PDO::PARAM_INT);
+		$query->bindValue(":user_id", $this->id, PDO::PARAM_INT);
+		$query->execute();
+		$data = $query->fetch();
+		
+		return $data["nb"] > 0;
+	}
 }

@@ -58,4 +58,14 @@ class Session {
 		
 		return $query->execute();
 	}
+	
+	public function setAdminValue(int $value) : bool {
+		global $db;
+		
+		$query = $db->prepare("UPDATE sessions SET admin = :admin WHERE name = :name");
+		$query->bindValue(":admin", $value, PDO::PARAM_INT);
+		$query->bindValue(":name", $this->name, PDO::PARAM_STR);
+		
+		return $query->execute();
+	}
 }

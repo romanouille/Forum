@@ -34,7 +34,7 @@ if (!empty($poll)) {
 <a href="#" title="Suivre" class="btn blue waves-effect waves-light">Suivre</a>
 
 <div class="right">
-	<a href="#" class="btn orange darken-3 waves-effect waves-light dropdown-trigger">Modération</a>
+	<a href="#" class="btn orange darken-3 waves-effect waves-light">Modération</a>
 </div>
 
 <ul class="pagination center">
@@ -77,7 +77,7 @@ if ($i <= $totalPages) {
 
 <?php
 $i = 1;
-foreach ($topicMessages as $topicMessage) {
+foreach ($topicMessages as $topicNb=>$topicMessage) {
 	$userMessage = new User($topicMessage["author"]);
 	$userData = $userMessage->getData();
 ?>
@@ -103,11 +103,45 @@ if ($topicMessage["author"] == $sessionData["user_id"] && time()-$topicMessage["
 					<a href="<?=$_SERVER["REQUEST_URI"]?>?edit_message=<?=$topicMessage["id"]?>" class="btn-floating waves-effect waves-light grey" title="Éditer le message" target="_blank"><i class="material-icons">edit</i></a>
 <?php
 }
+
+if ($sessionData["admin"] > 0) {
+	if (!$userMessage->isKicked($forumId)) {
 ?>
-					<a href="#" class="btn-floating waves-effect waves-light red" title="Kicker le membre"><i class="material-icons">gavel</i></a>
-					<a href="#" class="btn-floating waves-effect waves-light black" title="Bannir le membre"><i class="material-icons">gavel</i></a>
-					<a href="#" class="btn-floating waves-effect waves-light red" title="Supprimer le message"><i class="material-icons">delete</i></a>
+					<a href="#" class="btn-floating waves-effect waves-light red" title="Kicker le membre" onclick="kickUser(<?=$topicMessage["id"]?>)"><i class="material-icons">gavel</i></a>
+<?php
+	} else {
+?>
+					<a href="#" class="btn-floating waves-effect waves-light green" title="Dékicker le membre" onclick="unkickUser(<?=$topicMessage["author"]?>, <?=$forumId?>)"><i class="material-icons">gavel</i></a>
+<?php
+	}
+	
+	if (!$topicMessage["deleted"]) {
+		if ($topicNb == 0 && $page == 1) {
+?>
+					<a href="#" class="btn-floating waves-effect waves-light red" title="Supprimer le sujet" onclick="deleteTopic(<?=$forumId?>, <?=$topicId?>)"><i class="material-icons">delete</i></a>
+<?php
+		} else {
+?>
+					<a href="#" class="btn-floating waves-effect waves-light red" title="Supprimer le message" onclick="deleteMessage(<?=$topicMessage["id"]?>)"><i class="material-icons">delete</i></a>
+<?php
+		}
+	} else {
+		if ($topicNb == 0 && $page == 1) {
+?>
+					<a href="#" class="btn-floating waves-effect waves-light green" title="Restaurer le sujet" onclick="restoreMessage(<?=$forumId?>, <?=$topicId?>)"><i class="material-icons">delete</i></a>
+<?php
+		} else {
+?>
+					<a href="#" class="btn-floating waves-effect waves-light green" title="Restaurer le message" onclick="restoreMessage(<?=$topicMessage["id"]?>)"><i class="material-icons">delete</i></a>
+<?php
+		}
+	}
+} else {
+?>
 					<a href="#" class="btn-floating waves-effect waves-light red" title="Signaler le message"><i class="material-icons">report_problem</i></a>
+<?php
+}
+?>
 				</div>
 				<br>
 				<a href="#" class="permalink" title="Lien permanent">Posté le <?=date("d/m/Y à H:i:s", $topicMessage["timestamp"])?></a>

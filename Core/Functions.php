@@ -50,7 +50,7 @@ function slug(string $text) : string {
 function parseMessage(string $message, int $messageId) : string {
 	$message = htmlspecialchars($message);
 	
-	preg_match_all("`\[quote:(.+)]`isU", $message, $quotes);
+	preg_match_all("`\[quote:([0-9]+)]`isU", $message, $quotes);
 	
 	foreach ($quotes[1] as $originalQuote=>$messageId) {
 		$quote = new Message($messageId);
@@ -96,7 +96,7 @@ function parseMessage(string $message, int $messageId) : string {
 		$message = str_replace($quote, "<button type=\"button\" class=\"btn waves-effect waves-light\" onclick=\"document.getElementById('spoiler_$messageId').style.display='';this.style.display='none'\">Spoilers</button><span id=\"spoiler_$messageId\" style=\"display:none\">{$quotes[1][$nb]}</span>", $message);
 	}
 	
-	
+	$message = nl2br($message);
 	
 	return $message;
 }

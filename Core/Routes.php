@@ -15,5 +15,9 @@ $routes = [
 	"#^\/pm\/([0-9]+)$#" => "Pm_list.php",
 	"#^\/pm\/([0-9]+)-([0-9]+)$#" => "Pm.php",
 	"#^\/api\/stickers\/search$#" => "Api_stickers_search.php",
-	"#^\/account\/extendedaccess$#" => "Auth_extended_access.php"
+	"#^\/account\/extendedaccess$#" => "Auth_extended_access.php",
+	"#^\/api\/moderation\/kick$#" => "Api_moderation_kick.php",
+	"#^\/api\/moderation\/unkick$#" => "Api_moderation_unkick.php",
+	"#^\/api\/moderation\/messages\/delete$#" => "Api_moderation_messages_delete.php",
+	"#^\/api\/moderation\/messages\/restore$#" => "Api_moderation_messages_restore.php"
 ];

@@ -97,7 +97,7 @@ class Topic {
 	public function getMessages(int $page) : array {
 		global $db;
 		
-		$query = $db->prepare("SELECT id, author, (SELECT username FROM users WHERE id = author) AS username, content, timestamp FROM messages WHERE topic = :topic LIMIT 20 OFFSET ".(($page-1)*20));
+		$query = $db->prepare("SELECT id, author, (SELECT username FROM users WHERE id = author) AS username, content, timestamp, deleted FROM messages WHERE topic = :topic LIMIT 20 OFFSET ".(($page-1)*20));
 		$query->bindValue(":topic", $this->id, PDO::PARAM_INT);
 		$query->execute();
 		$data = $query->fetchAll();
@@ -109,7 +109,8 @@ class Topic {
 				"author" => (int)$value["author"],
 				"username" => (string)trim($value["username"]),
 				"content" => (string)trim($value["content"]),
-				"timestamp" => (int)$value["timestamp"]
+				"timestamp" => (int)$value["timestamp"],
+				"deleted" => (bool)$value["deleted"]
 			];
 		}
 		
