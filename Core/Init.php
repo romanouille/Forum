@@ -31,5 +31,11 @@ if (isset($_COOKIE["session"])) {
 	$hash = sha1($_COOKIE["session"]);
 } else {
 	$userLogged = false;
+	$sessionData = [
+		"deleted" => false,
+		"admin" => false,
+		"user_id" => 0
+	];
+	
 	$hash = sha1($_SERVER["REMOTE_ADDR"]);
 }

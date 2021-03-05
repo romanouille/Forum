@@ -36,11 +36,11 @@ if (isset($match[3]) && isset($match[4]) && is_string($match[3]) && is_string($m
 		require "Handlers/Error.php";
 	}
 	
-	$topics = $forum->getTopics($page, $searchType, $searchText);
-	$pagesNb = $forum->getPagesNb($searchType, $searchText, $forumId);
+	$topics = $forum->getTopics($page, $searchType, $searchText, $sessionData["admin"]);
+	$pagesNb = $forum->getPagesNb($searchType, $searchText, $forumId, $sessionData["admin"]);
 } else {
-	$topics = $forum->getTopics($page);
-	$pagesNb = $forum->getPagesNb();
+	$topics = $forum->getTopics($page, 0, "", $sessionData["admin"]);
+	$pagesNb = $forum->getPagesNb(0, "", 0, $sessionData["admin"]);
 	$isSearch = false;
 }
 

@@ -17,7 +17,7 @@ class User {
 	public function getData() : array {
 		global $db;
 		
-		$query = $db->prepare("SELECT username, messages, points, avatar, admin FROM users WHERE id = :id");
+		$query = $db->prepare("SELECT username, messages, points, avatar_id, admin FROM users WHERE id = :id");
 		$query->bindValue(":id", $this->id, PDO::PARAM_INT);
 		$query->execute();
 		$data = $query->fetch();
@@ -25,7 +25,7 @@ class User {
 			"username" => (string)trim($data["username"]),
 			"messages" => (int)$data["messages"],
 			"points" => (int)$data["points"],
-			"avatar" => (int)$data["avatar"],
+			"avatar_id" => (int)$data["avatar_id"],
 			"admin" => (int)$data["admin"]
 		];
 		
@@ -42,12 +42,25 @@ class User {
 	public function checkPassword(string $password) : bool {
 		global $db;
 		
-		$query = $db->prepare("SELECT password FROM users WHERE id = :id");
+		$query = $db->prepare("SELECT password, noelfic_password FROM users WHERE id = :id");
 		$query->bindValue(":id", $this->id, PDO::PARAM_INT);
 		$query->execute();
-		$data = $query->fetch();
+		$data = array_map("trim", $query->fetch());
 		
-		return password_verify($password, trim($data["password"]));
+		if (!empty($data["noelfic_password"])) {
+			if (md5($password) == $data["noelfic_password"]) {
+				$query = $db->prepare("UPDATE users SET password = :password, noelfic_password = '' WHERE id = :id");
+				$query->bindValue(":password", password_hash($password, PASSWORD_DEFAULT), PDO::PARAM_STR);
+				$query->bindValue(":id", $this->id, PDO::PARAM_INT);
+				$query->execute();
+				
+				return true;
+			} else {
+				return false;
+			}
+		}
+		
+		return password_verify($password, $data["password"]);
 	}
 	
 	/**

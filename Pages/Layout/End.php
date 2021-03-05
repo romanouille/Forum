@@ -174,9 +174,99 @@ function deleteTopic(forumId, topicId) {
 	xhr.onreadystatechange = function() {
 		if (this.readyState == XMLHttpRequest.DONE) {
 			if (this.status == 200) {
-				alert("Le sujet a été supprimé.");
+				alert("Le topic a été supprimé.");
 			} else {
-				alert("Une erreur est survenue durant la suppression du sujet.");
+				alert("Une erreur est survenue durant la suppression du topic.");
+			}
+		}
+	}
+	
+	xhr.send("forumId="+forumId+"&topicId="+topicId+"&token="+token);
+}
+
+function restoreTopic(forumId, topicId) {
+	let xhr = new XMLHttpRequest();
+	xhr.open("POST", "/api/moderation/topics/restore");
+	
+	xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+	xhr.onreadystatechange = function() {
+		if (this.readyState == XMLHttpRequest.DONE) {
+			if (this.status == 200) {
+				alert("Le topic a été restauré.");
+			} else {
+				alert("Une erreur est survenue durant la restauration du topic.");
+			}
+		}
+	}
+	
+	xhr.send("forumId="+forumId+"&topicId="+topicId+"&token="+token);
+}
+
+function pinTopic(forumId, topicId) {
+	let xhr = new XMLHttpRequest();
+	xhr.open("POST", "/api/moderation/topics/pin");
+	
+	xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+	xhr.onreadystatechange = function() {
+		if (this.readyState == XMLHttpRequest.DONE) {
+			if (this.status == 200) {
+				alert("Le topic a été épinglé.");
+			} else {
+				alert("Une erreur est survenue durant l'épinglage du topic.");
+			}
+		}
+	}
+	
+	xhr.send("forumId="+forumId+"&topicId="+topicId+"&token="+token);
+}
+
+function unpinTopic(forumId, topicId) {
+	let xhr = new XMLHttpRequest();
+	xhr.open("POST", "/api/moderation/topics/unpin");
+	
+	xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+	xhr.onreadystatechange = function() {
+		if (this.readyState == XMLHttpRequest.DONE) {
+			if (this.status == 200) {
+				alert("Le topic a été désépinglé.");
+			} else {
+				alert("Une erreur est survenue durant le désépinglage du topic.");
+			}
+		}
+	}
+	
+	xhr.send("forumId="+forumId+"&topicId="+topicId+"&token="+token);
+}
+
+function lockTopic(forumId, topicId) {
+	let xhr = new XMLHttpRequest();
+	xhr.open("POST", "/api/moderation/topics/lock");
+	
+	xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+	xhr.onreadystatechange = function() {
+		if (this.readyState == XMLHttpRequest.DONE) {
+			if (this.status == 200) {
+				alert("Le topic a été locké.");
+			} else {
+				alert("Une erreur est survenue durant le lock du topic.");
+			}
+		}
+	}
+	
+	xhr.send("forumId="+forumId+"&topicId="+topicId+"&token="+token);
+}
+
+function unlockTopic(forumId, topicId) {
+	let xhr = new XMLHttpRequest();
+	xhr.open("POST", "/api/moderation/topics/unlock");
+	
+	xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+	xhr.onreadystatechange = function() {
+		if (this.readyState == XMLHttpRequest.DONE) {
+			if (this.status == 200) {
+				alert("Le topic a été délocké.");
+			} else {
+				alert("Une erreur est survenue durant le délock du topic.");
 			}
 		}
 	}

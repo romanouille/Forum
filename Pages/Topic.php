@@ -33,19 +33,45 @@ if (!empty($poll)) {
 <a href="/forums/blabla-general/1" title="Liste des sujets" class="btn blue waves-effect waves-light">Liste des sujets</a>
 <a href="#" title="Suivre" class="btn blue waves-effect waves-light">Suivre</a>
 
+<?php
+if ($sessionData["admin"]) {
+?>
 <div class="right">
-	<a href="#" class="btn orange darken-3 waves-effect waves-light">Modération</a>
+<?php
+	if (!$topic->isPinned()) {
+?>
+	<a href="#" class="btn orange darken-3 waves-effect waves-light" onclick="pinTopic(<?=$forumId?>, <?=$topicId?>)">Épingler</a>
+<?php
+	} else {
+?>
+	<a href="#" class="btn orange darken-3 waves-effect waves-light" onclick="unpinTopic(<?=$forumId?>, <?=$topicId?>)">Désépingler</a>
+<?php
+	}
+
+	if (!$topic->isLocked()) {
+?>
+	<a href="#" class="btn orange darken-3 waves-effect waves-light" onclick="lockTopic(<?=$forumId?>, <?=$topicId?>)">Locker</a>
+<?php
+	} else {
+?>
+	<a href="#" class="btn orange darken-3 waves-effect waves-light" onclick="unlockTopic(<?=$forumId?>, <?=$topicId?>)">Délocker</a>
+<?php
+	}
+?>
 </div>
+<?php
+}
+?>
 
 <ul class="pagination center">
-	<li class="waves-effect<?=$page < 2 ? " disabled" : ""?>"><a href="<?=$page > 1 ? "/forums/$forumId-$topicId-".($page-1)."-$topicSlug" : "#"?>"><i class="material-icons">chevron_left</i></a></li>
+	<li class="waves-effect<?=$page < 2 ? " disabled" : ""?>"><a href="<?=$page > 1 ? "/forums/$forumSlug/$topicId-".($page-1)."-$topicSlug" : "#"?>"><i class="material-icons">chevron_left</i></a></li>
 <?php
 
 $cond = $page > 6 ? $page-5 : 1;
 
 if ($cond > 1) {
 ?>
-	<li class="waves-effect"><a href="/forums/<?=$forumId?>-<?=$topicId?>-1-<?=$topicSlug?>">1</a></li> ...
+	<li class="waves-effect"><a href="/forums/<?=$forumSlug?>/<?=$topicId?>-1-<?=$topicSlug?>">1</a></li> ...
 <?php
 }
 
@@ -60,18 +86,18 @@ for ($i = $cond; $i <= $page+5; $i++) {
 <?php
 	} else {
 ?>
-	<li class="waves-effect"><a href="/forums/<?=$forumId?>-<?=$topicId?>-<?=$i?>-<?=$topicSlug?>"><?=$i?></a></li>
+	<li class="waves-effect"><a href="/forums/<?=$forumSlug?>/<?=$topicId?>-<?=$i?>-<?=$topicSlug?>"><?=$i?></a></li>
 <?php
 	}
 }
 
 if ($i <= $totalPages) {
 ?>
-... <li class="waves-effect"><a href="/forums/<?=$forumId?>-<?=$topicId?>-<?=$totalPages?>-<?=$topicSlug?>"><?=$totalPages?></a></li>
+... <li class="waves-effect"><a href="/forums/<?=$forumSlug?>/<?=$topicId?>-<?=$totalPages?>-<?=$topicSlug?>"><?=$totalPages?></a></li>
 <?php
 }
 ?>
-	<li class="waves-effect<?=$page >= $totalPages ? " disabled" : ""?>"><a href="<?=$page < $totalPages ? "/forums/$forumId-$topicId-".($page+1)."-$topicSlug" : "#"?>"><i class="material-icons">chevron_right</i></a></li>
+	<li class="waves-effect<?=$page >= $totalPages ? " disabled" : ""?>"><a href="<?=$page < $totalPages ? "/forums/$forumSlug/$topicId-".($page+1)."-$topicSlug" : "#"?>"><i class="material-icons">chevron_right</i></a></li>
 </ul>
 
 
@@ -117,9 +143,15 @@ if ($sessionData["admin"] > 0) {
 	
 	if (!$topicMessage["deleted"]) {
 		if ($topicNb == 0 && $page == 1) {
+			if (!$topic->isDeleted()) {
 ?>
 					<a href="#" class="btn-floating waves-effect waves-light red" title="Supprimer le sujet" onclick="deleteTopic(<?=$forumId?>, <?=$topicId?>)"><i class="material-icons">delete</i></a>
 <?php
+			} else {
+?>
+					<a href="#" class="btn-floating waves-effect waves-light green" title="Restaurer le sujet" onclick="restoreTopic(<?=$forumId?>, <?=$topicId?>)"><i class="material-icons">delete</i></a>
+<?php
+			}
 		} else {
 ?>
 					<a href="#" class="btn-floating waves-effect waves-light red" title="Supprimer le message" onclick="deleteMessage(<?=$topicMessage["id"]?>)"><i class="material-icons">delete</i></a>
@@ -160,14 +192,14 @@ if ($sessionData["admin"] > 0) {
 ?>
 
 <ul class="pagination center">
-	<li class="waves-effect<?=$page < 2 ? " disabled" : ""?>"><a href="<?=$page > 1 ? "/forums/$forumId-$topicId-".($page-1)."-$topicSlug" : "#"?>"><i class="material-icons">chevron_left</i></a></li>
+	<li class="waves-effect<?=$page < 2 ? " disabled" : ""?>"><a href="<?=$page > 1 ? "/forums/$forumSlug/$topicId-".($page-1)."-$topicSlug" : "#"?>"><i class="material-icons">chevron_left</i></a></li>
 <?php
 
 $cond = $page > 6 ? $page-5 : 1;
 
 if ($cond > 1) {
 ?>
-	<li class="waves-effect"><a href="/forums/<?=$forumId?>-<?=$topicId?>-1-<?=$topicSlug?>">1</a></li> ...
+	<li class="waves-effect"><a href="/forums/<?=$forumSlug?>/<?=$topicId?>-1-<?=$topicSlug?>">1</a></li> ...
 <?php
 }
 
@@ -182,18 +214,18 @@ for ($i = $cond; $i <= $page+5; $i++) {
 <?php
 	} else {
 ?>
-	<li class="waves-effect"><a href="/forums/<?=$forumId?>-<?=$topicId?>-<?=$i?>-<?=$topicSlug?>"><?=$i?></a></li>
+	<li class="waves-effect"><a href="/forums/<?=$forumSlug?>/<?=$topicId?>-<?=$i?>-<?=$topicSlug?>"><?=$i?></a></li>
 <?php
 	}
 }
 
 if ($i <= $totalPages) {
 ?>
-... <li class="waves-effect"><a href="/forums/<?=$forumId?>-<?=$topicId?>-<?=$totalPages?>-<?=$topicSlug?>"><?=$totalPages?></a></li>
+... <li class="waves-effect"><a href="/forums/<?=$forumSlug?>/<?=$topicId?>-<?=$totalPages?>-<?=$topicSlug?>"><?=$totalPages?></a></li>
 <?php
 }
 ?>
-	<li class="waves-effect<?=$page >= $totalPages ? " disabled" : ""?>"><a href="<?=$page < $totalPages ? "/forums/$forumId-$topicId-".($page+1)."-$topicSlug" : "#"?>"><i class="material-icons">chevron_right</i></a></li>
+	<li class="waves-effect<?=$page >= $totalPages ? " disabled" : ""?>"><a href="<?=$page < $totalPages ? "/forums/$forumSlug/$topicId-".($page+1)."-$topicSlug" : "#"?>"><i class="material-icons">chevron_right</i></a></li>
 </ul>
 
 

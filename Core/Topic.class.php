@@ -12,7 +12,7 @@ class Topic {
 	}
 	
 	/**
-	 * Vérifie si le forum existe
+	 * Vérifie si le topic existe
 	 *
 	 * @return bool Résultat
 	 */
@@ -28,6 +28,144 @@ class Topic {
 	}
 	
 	/**
+	 * Vérifie si le topic est supprimé
+	 *
+	 * @return bool Résultat
+	 */
+	public function isDeleted() : bool {
+		global $db;
+		 
+		$query = $db->prepare("SELECT deleted FROM topics WHERE id = :id");
+		$query->bindValue(":id", $this->id, PDO::PARAM_INT);
+		$query->execute();
+		$data = $query->fetch();
+		 
+		return $data["deleted"] == 1;
+	}
+	 
+	/**
+	 * Supprime le topic
+	 *
+	 * @return bool Résultat
+	 */
+	public function delete() : bool {
+		global $db;
+		
+		$query = $db->prepare("UPDATE topics SET deleted = 1 WHERE id = :id");
+		$query->bindValue(":id", $this->id, PDO::PARAM_INT);
+		$query->execute();
+		
+		return true;
+	 }
+	
+	/**
+	 * Restaure le topic
+	 *
+	 * @return bool Résultat
+	 */
+	public function restore() : bool {
+		global $db;
+		 
+		$query = $db->prepare("UPDATE topics SET deleted = 0 WHERE id = :id");
+		$query->bindValue(":id", $this->id, PDO::PARAM_INT);
+		$query->execute();
+		 
+		return true;
+	}
+	 
+	/**
+	 * Épingle le topic
+	 *
+	 * @return bool Résultat
+	 */
+	public function pin() : bool {
+		global $db;
+		 
+		$query = $db->prepare("UPDATE topics SET pinned = 1 WHERE id = :id");
+		$query->bindValue(":id", $this->id, PDO::PARAM_INT);
+		$query->execute();
+		 
+		return true;
+	}
+	 
+	/**
+	 * Désépingle le topic
+	 *
+	 * @return bool Résultat
+	 */
+	public function unpin() : bool {
+		global $db;
+		
+		$query = $db->prepare("UPDATE topics SET pinned = 0 WHERE id = :id");
+		$query->bindValue(":id", $this->id, PDO::PARAM_INT);
+		$query->execute();
+		
+		return true;
+	}
+	
+	/**
+	 * Lock le topic
+	 *
+	 * @return bool Résultat
+	 */
+	public function lock() : bool {
+		global $db;
+		 
+		$query = $db->prepare("UPDATE topics SET locked = 1 WHERE id = :id");
+		$query->bindValue(":id", $this->id, PDO::PARAM_INT);
+		$query->execute();
+		 
+		return true;
+	}
+	 
+	/**
+	 * Délock le topic
+	 *
+	 * @return bool Résultat
+	 */
+	public function unlock() : bool {
+		global $db;
+			
+		$query = $db->prepare("UPDATE topics SET locked = 0 WHERE id = :id");
+		$query->bindValue(":id", $this->id, PDO::PARAM_INT);
+		$query->execute();
+			
+		return true;
+	 }
+	
+	/**
+	 * Vérifie si le topic est épinglé
+	 *
+	 * @return bool Résultat
+	 */
+	public function isPinned() : bool {
+		global $db;
+		
+		$query = $db->prepare("SELECT pinned FROM topics WHERE id = :id");
+		$query->bindValue(":id", $this->id, PDO::PARAM_INT);
+		$query->execute();
+		$data = $query->fetch();
+		
+		return $data["pinned"] == 1;
+	}
+	
+	/**
+	 * Vérifie si le topic est locké
+	 *
+	 * @return bool Résultat
+	 */
+	public function isLocked() : bool {
+		global $db;
+		
+		$query = $db->prepare("SELECT locked FROM topics WHERE id = :id");
+		$query->bindValue(":id", $this->id, PDO::PARAM_INT);
+		$query->execute();
+		$data = $query->fetch();
+		
+		return $data["locked"] == 1;
+	}
+	
+	/**
 	 * Crée un topic
 	 *
 	 * @param int $forum ID du forum
@@ -37,7 +175,7 @@ class Topic {
 	 *
 	 * @return int ID du topic créé
 	 */
-	public static function create(int $forum, int $author, string $title, string $message) : int {
+	 public static function create(int $forum, int $author, string $title, string $message) : int {
 		global $db;
 		
 		$query = $db->prepare("INSERT INTO topics(forum, author, title, last_message_timestamp) VALUES(:forum, :author, :title, :last_message_timestamp)");
@@ -97,7 +235,7 @@ class Topic {
 	public function getMessages(int $page) : array {
 		global $db;
 		
-		$query = $db->prepare("SELECT id, author, (SELECT username FROM users WHERE id = author) AS username, content, timestamp, deleted FROM messages WHERE topic = :topic LIMIT 20 OFFSET ".(($page-1)*20));
+		$query = $db->prepare("SELECT id, author, (SELECT username FROM users WHERE id = author) AS username, content, timestamp, deleted FROM messages WHERE topic = :topic ORDER BY timestamp ASC LIMIT 20 OFFSET ".(($page-1)*20));
 		$query->bindValue(":topic", $this->id, PDO::PARAM_INT);
 		$query->execute();
 		$data = $query->fetchAll();

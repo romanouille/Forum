@@ -164,8 +164,7 @@ hr {
 	padding: 0!important
 }
 
-#topics-list #topic-icon,
-#topics-list #topic-mod {
+#topics-list #topic-icon {
 	width: 5%
 }
 

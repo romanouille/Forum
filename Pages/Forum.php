@@ -65,7 +65,6 @@ if (!empty($topics)) {
 			<th id="topic-author">Auteur
 			<th id="topic-nb" class="hide-on-med-and-down">Nb
 			<th id="topic-last" class="hide-on-med-and-down">Dernier message
-			<th id="topic-mod">
 	</thead>
 	<tbody>
 <?php
@@ -85,6 +84,10 @@ foreach ($topics as $topic) {
 ?>
 			<td><i class="material-icons red-text">push_pin</i>
 <?php
+	} elseif ($topic["locked"]) {
+?>
+			<td><i class="material-icons grey-text">lock</i>
+<?php
 	} elseif ($topic["replies"] >= 20) {
 ?>
 			<td><i class="material-icons red-text">folder</i>
@@ -99,8 +102,7 @@ foreach ($topics as $topic) {
 			<td><a href="/forums/<?=$match[1]?>/<?=$topic["id"]?>-1-<?=slug($topic["title"])?>" title="<?=htmlspecialchars($topic["title"])?>"><?=$topic["title"]?></a>
 			<td><a href="/user/<?=$topic["topic_username"]?>" target="_blank"><?=$topic["topic_username"]?></a>
 			<td class="hide-on-med-and-down"><?=$topic["replies"]?>
-			<td class="hide-on-med-and-down"><?=date("d/m H:i:s", $topic["last_message_timestamp"])?>
-			<td>
+			<td class="hide-on-med-and-down"><?=date("d/m/y H:i:s", $topic["last_message_timestamp"])?>
 <?php
 	if (isset($topic["content"])) {
 ?>
@@ -109,8 +111,7 @@ foreach ($topics as $topic) {
 				<td><?=htmlspecialchars($topic["content"])?>
 				<td><a href="/user/<?=$topic["message_username"]?>" target="_blank"><?=$topic["message_username"]?></a>
 				<td class="hide-on-med-and-down">
-				<td class="hide-on-med-and-down"><?=date("d/m H:i:s", $topic["message_timestamp"])?>
-				<td>
+				<td class="hide-on-med-and-down"><?=date("d/m/y H:i:s", $topic["message_timestamp"])?>
 <?php
 	}
 

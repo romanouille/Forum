@@ -6,6 +6,7 @@ require "Core/Message.class.php";
 require "Core/Sticker.class.php";
 
 $forumId = Forum::getIdByName($match[1]);
+$forumSlug = explode("/", $_SERVER["REQUEST_URI"])[2];
 $topicId = $match[2];
 $page = $match[3];
 
@@ -15,13 +16,18 @@ if (!$forum->exists()) {
 	require "Handlers/Error.php";
 }
 
-$forumName = $forum->getName();
-
 $topic = new Topic($forumId, $topicId);
 if (!$topic->exists()) {
 	http_response_code(404);
 	require "Handlers/Error.php";
 }
+
+if ($topic->isDeleted() && !$sessionData["admin"]) {
+	http_response_code(404);
+	require "Handlers/Error.php";
+}
+
+$forumName = $forum->getName();
 
 $poll = $topic->getPoll();
 $votedOnPoll = $userLogged ? $user->votedOnPoll($topicId) : true;
